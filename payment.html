@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ชำระเงิน – ร้านแฟชั่นเสื้อผ้า</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{
+      --p:#7c3aed; --pl:#ede9fe; --ac:#ec4899; --ok:#10b981; --warn:#f59e0b;
+      --dk:#1e1b4b; --gr:#64748b; --bg:#f5f3ff; --red:#ef4444;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
+
+    /* ── TOP BAR ── */
+    .topbar{
+      background:linear-gradient(135deg,#7c3aed,#ec4899);
+      padding:0 24px; height:58px; display:flex; align-items:center;
+      justify-content:space-between; box-shadow:0 2px 12px rgba(124,58,237,.3);
+    }
+    .topbar-brand{display:flex;align-items:center;gap:10px;color:#fff;}
+    .topbar-brand i{font-size:1.3rem;}
+    .topbar-brand span{font-size:1rem;font-weight:700;}
+    .topbar-right{color:rgba(255,255,255,.8);font-size:.82rem;}
+
+    /* ── STEP BAR ── */
+    .stepbar{background:#fff;padding:18px 0;box-shadow:0 1px 8px rgba(124,58,237,.07);}
+    .steps{display:flex;justify-content:center;align-items:center;gap:0;max-width:640px;margin:0 auto;padding:0 16px;}
+    .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;}
+    .step:not(:last-child)::after{
+      content:''; position:absolute; top:18px; left:60%; width:80%; height:2px;
+      background:#e5e7eb; z-index:0;
+    }
+    .step.done:not(:last-child)::after{background:var(--ok);}
+    .step.active:not(:last-child)::after{background:linear-gradient(90deg,var(--p),#e5e7eb);}
+    .step-circle{
+      width:36px; height:36px; border-radius:50%; border:2px solid #e5e7eb;
+      display:flex;align-items:center;justify-content:center; font-size:.85rem;
+      background:#fff; color:#94a3b8; font-weight:700; position:relative;z-index:1;
+      transition:all .3s;
+    }
+    .step.active .step-circle{border-color:var(--p);background:var(--p);color:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.2);}
+    .step.done .step-circle{border-color:var(--ok);background:var(--ok);color:#fff;}
+    .step-label{font-size:.72rem;font-weight:600;color:#94a3b8;text-align:center;white-space:nowrap;}
+    .step.active .step-label{color:var(--p);}
+    .step.done .step-label{color:var(--ok);}
+
+    /* ── LAYOUT ── */
+    .layout{max-width:900px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
+    @media(max-width:680px){.layout{grid-template-columns:1fr;}}
+
+    /* ── CARDS ── */
+    .card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 2px 16px rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.06);}
+    .card-title{font-size:1rem;font-weight:700;color:var(--p);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+    .card-title .ic{width:34px;height:34px;background:var(--pl);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--p);flex-shrink:0;}
+
+    /* ── ORDER SUMMARY ── */
+    .order-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;}
+    .order-item:last-child{border:none;}
+    .oi-icon{font-size:1.6rem;width:36px;text-align:center;}
+    .oi-info{flex:1;}
+    .oi-name{font-size:.88rem;font-weight:600;color:#374151;}
+    .oi-sub{font-size:.75rem;color:var(--gr);}
+    .oi-price{font-weight:700;font-size:.92rem;color:var(--dk);}
+
+    /* ── SUMMARY TOTALS ── */
+    .sum-row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:8px;color:#374151;}
+    .sum-row.disc{color:var(--ok);}
+    .sum-row.total{font-size:1.2rem;font-weight:800;color:var(--p);border-top:2px dashed #e5e7eb;padding-top:10px;margin-top:4px;}
+
+    /* ── STEP PANELS ── */
+    .step-panel{display:none;}
+    .step-panel.active{display:block;}
+
+    /* ── METHOD GRID ── */
+    .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .method-card{
+      border:2px solid #e5e7eb;border-radius:16px;padding:20px 14px;text-align:center;
+      cursor:pointer;transition:all .25s;background:#fff;
+    }
+    .method-card:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,58,237,.15);}
+    .method-card.selected{border-color:var(--p);background:var(--pl);box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+    .method-card .m-icon{font-size:2.5rem;margin-bottom:10px;display:block;}
+    .method-card .m-name{font-size:.9rem;font-weight:700;color:#374151;margin-bottom:3px;}
+    .method-card .m-desc{font-size:.72rem;color:var(--gr);}
+    .method-card.selected .m-name{color:var(--p);}
+
+    /* ── CASH NUMPAD ── */
+    .received-display{
+      background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:14px;
+      padding:18px 20px;margin-bottom:16px;text-align:right;
+    }
+    .received-label{font-size:.75rem;color:rgba(255,255,255,.6);margin-bottom:4px;}
+    .received-amount{font-size:2.2rem;font-weight:800;color:#fff;font-family:'Courier New',monospace;}
+    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+    .num-btn{
+      padding:16px;border-radius:12px;border:1.5px solid #e5e7eb;background:#fff;
+      font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .15s;color:#374151;
+    }
+    .num-btn:hover{background:var(--pl);border-color:var(--p);color:var(--p);}
+    .num-btn:active{transform:scale(.95);}
+    .num-btn.zero{grid-column:span 2;}
+    .num-btn.del{background:#fee2e2;color:var(--red);border-color:#fca5a5;}
+    .num-btn.del:hover{background:var(--red);color:#fff;}
+    .quick-btns{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+    .quick-btn{
+      flex:1;min-width:80px;padding:9px 8px;border-radius:9px;border:1.5px solid #e5e7eb;
+      background:#fff;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;color:#374151;
+    }
+    .quick-btn:hover{background:var(--pl);border-color:var(--p);color:var(--p);}
+    .change-box{
+      background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;
+      padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+    }
+    .change-label{font-size:.85rem;font-weight:600;color:#166534;display:flex;align-items:center;gap:6px;}
+    .change-value{font-size:1.5rem;font-weight:800;color:#16a34a;}
+    .change-box.over{background:#fef2f2;border-color:#fca5a5;}
+    .change-box.over .change-label{color:#991b1b;}
+    .change-box.over .change-value{color:var(--red);}
+
+    /* ── QR ── */
+    .qr-wrap{text-align:center;}
+    .qr-frame{
+      width:220px;height:220px;margin:0 auto 16px;border:3px solid var(--p);border-radius:16px;
+      display:flex;align-items:center;justify-content:center;background:#fff;
+      box-shadow:0 4px 20px rgba(124,58,237,.15);position:relative;overflow:hidden;
+    }
+    .qr-inner{width:188px;height:188px;}
+    .qr-scan-line{
+      position:absolute;left:8px;right:8px;height:2px;background:linear-gradient(90deg,transparent,var(--ac),transparent);
+      animation:scan 2s linear infinite;
+    }
+    @keyframes scan{0%{top:8px;}100%{top:calc(100% - 10px);}}
+    .qr-timer{
+      display:inline-flex;align-items:center;gap:7px;background:#fef3c7;border:1px solid #fde68a;
+      border-radius:99px;padding:6px 16px;font-size:.82rem;font-weight:700;color:#92400e;margin-bottom:12px;
+    }
+    .amount-highlight{
+      font-size:2rem;font-weight:900;color:var(--p);text-align:center;margin-bottom:6px;
+    }
+    .bank-info{background:var(--pl);border-radius:12px;padding:14px 16px;margin-top:12px;}
+    .bank-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.85rem;}
+    .bank-row:last-child{margin:0;}
+    .bank-row span:first-child{color:var(--gr);font-weight:600;}
+    .bank-row span:last-child{font-weight:700;color:var(--dk);}
+    .copy-btn{
+      background:var(--p);color:#fff;border:none;border-radius:6px;
+      padding:3px 10px;font-size:.72rem;cursor:pointer;font-weight:600;
+    }
+
+    /* ── CARD PAYMENT ── */
+    .card-visual{
+      width:100%;max-width:320px;height:180px;margin:0 auto 20px;border-radius:18px;
+      background:linear-gradient(135deg,#1e1b4b 0%,#7c3aed 50%,#ec4899 100%);
+      padding:20px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,.4);
+    }
+    .card-visual::before{
+      content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;
+      border-radius:50%;background:rgba(255,255,255,.08);
+    }
+    .card-chip{width:36px;height:28px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:5px;margin-bottom:16px;}
+    .card-number{font-size:1.05rem;letter-spacing:3px;font-family:'Courier New',monospace;margin-bottom:14px;opacity:.9;}
+    .card-bottom{display:flex;justify-content:space-between;font-size:.78rem;opacity:.85;}
+    .card-bottom .label{font-size:.6rem;opacity:.7;margin-bottom:2px;}
+
+    .form-group{margin-bottom:14px;}
+    .form-group label{display:block;font-size:.82rem;font-weight:600;color:#374151;margin-bottom:6px;}
+    .form-group input{
+      width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:10px;
+      font-size:.93rem;outline:none;transition:border .2s;background:#fafafa;
+    }
+    .form-group input:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,.1);}
+    .input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .card-logo{position:absolute;bottom:18px;right:20px;font-size:1.8rem;opacity:.9;}
+
+    /* ── TRANSFER ── */
+    .bank-card{
+      border:1.5px solid #e5e7eb;border-radius:14px;padding:16px;margin-bottom:12px;
+      display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;
+    }
+    .bank-card:hover,.bank-card.sel{border-color:var(--p);background:var(--pl);}
+    .bank-logo{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+    .bank-details{flex:1;}
+    .bank-name{font-size:.88rem;font-weight:700;color:#374151;}
+    .bank-acc{font-size:.8rem;color:var(--gr);margin-top:2px;}
+    .bank-acct-num{font-size:.95rem;font-weight:800;color:var(--dk);margin-top:3px;font-family:'Courier New',monospace;}
+    .slip-upload{
+      border:2px dashed #d1d5db;border-radius:14px;padding:28px;text-align:center;
+      cursor:pointer;transition:all .2s;background:#fafafa;margin-top:14px;
+    }
+    .slip-upload:hover{border-color:var(--p);background:var(--pl);}
+    .slip-upload i{font-size:2rem;color:var(--gr);margin-bottom:8px;display:block;}
+    .slip-upload .su-text{font-size:.85rem;font-weight:600;color:var(--gr);}
+    .slip-upload .su-sub{font-size:.73rem;color:#94a3b8;margin-top:3px;}
+    #slipPreview{display:none;margin-top:12px;text-align:center;}
+    #slipPreview img{max-height:140px;border-radius:10px;border:1px solid #e5e7eb;}
+
+    /* ── CONFIRM BTN ── */
+    .confirm-btn{
+      width:100%;padding:15px;background:linear-gradient(135deg,var(--p),var(--ac));
+      color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;
+      cursor:pointer;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:10px;
+      box-shadow:0 6px 20px rgba(124,58,237,.35);transition:all .2s;
+    }
+    .confirm-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,.45);}
+    .confirm-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+    .back-btn{
+      width:100%;padding:11px;background:#f1f5f9;color:var(--gr);border:1.5px solid #e2e8f0;
+      border-radius:12px;font-size:.88rem;font-weight:600;cursor:pointer;margin-top:8px;
+      transition:background .2s;
+    }
+    .back-btn:hover{background:#e2e8f0;}
+
+    /* ── SUCCESS ── */
+    .success-wrap{max-width:480px;margin:40px auto;padding:0 16px;text-align:center;}
+    .success-ring{
+      width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#d1fae5,#a7f3d0);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+      font-size:3rem;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+    .success-wrap h2{font-size:1.8rem;font-weight:800;color:var(--dk);margin-bottom:8px;}
+    .success-wrap p{color:var(--gr);font-size:.93rem;line-height:1.6;margin-bottom:24px;}
+
+    /* ── RECEIPT ── */
+    .receipt{
+      background:#fff;border-radius:20px;padding:24px;text-align:left;
+      box-shadow:0 2px 16px rgba(0,0,0,.07);position:relative;
+    }
+    .receipt::before,.receipt::after{
+      content:'';position:absolute;left:0;right:0;height:12px;
+      background:radial-gradient(circle at 10px 50%,var(--bg) 8px,transparent 0) repeat-x,
+                 radial-gradient(circle at 10px 50%,var(--bg) 8px,transparent 0) repeat-x;
+      background-size:20px 12px;
+    }
+    .receipt::before{top:-6px;background-position:0 0;}
+    .receipt::after{bottom:-6px;background-position:0 100%;}
+    .receipt-logo{text-align:center;margin-bottom:14px;}
+    .receipt-logo .shop{font-size:1.1rem;font-weight:800;color:var(--dk);}
+    .receipt-logo .date{font-size:.75rem;color:var(--gr);margin-top:3px;}
+    .r-divider{border:none;border-top:1px dashed #d1d5db;margin:12px 0;}
+    .r-row{display:flex;justify-content:space-between;font-size:.83rem;padding:3px 0;color:#374151;}
+    .r-item{display:flex;justify-content:space-between;font-size:.82rem;padding:4px 0;}
+    .r-item-name{color:#374151;}
+    .r-item-price{font-weight:600;color:var(--dk);}
+    .r-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800;color:var(--p);padding:8px 0;}
+    .r-method{
+      text-align:center;background:var(--pl);border-radius:9px;padding:8px;
+      font-size:.82rem;font-weight:700;color:var(--p);margin-top:10px;
+    }
+    .r-thanks{text-align:center;margin-top:14px;font-size:.8rem;color:var(--gr);line-height:1.6;}
+
+    .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px;}
+    .action-btns a,.action-btns button{
+      padding:12px;border-radius:12px;font-size:.88rem;font-weight:700;
+      cursor:pointer;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:7px;
+      border:none;transition:all .2s;
+    }
+    .btn-print{background:var(--p);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.3);}
+    .btn-print:hover{transform:translateY(-1px);}
+    .btn-new{background:#f1f5f9;color:var(--gr);border:1.5px solid #e2e8f0;}
+    .btn-new:hover{background:#e2e8f0;}
+
+    @media print{
+      .topbar,.stepbar,.layout>*:not(.receipt-col){display:none!important;}
+      .receipt{box-shadow:none;border-radius:0;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <i class="fa-solid fa-bag-shopping"></i>
+    <span>ร้านแฟชั่นเสื้อผ้า</span>
+  </div>
+  <div class="topbar-right" id="clockBar"></div>
+</div>
+
+<!-- STEP BAR -->
+<div class="stepbar">
+  <div class="steps">
+    <div class="step active" id="s1">
+      <div class="step-circle"><i class="fa-solid fa-list"></i></div>
+      <div class="step-label">สรุปรายการ</div>
+    </div>
+    <div class="step" id="s2">
+      <div class="step-circle"><i class="fa-solid fa-credit-card"></i></div>
+      <div class="step-label">วิธีชำระ</div>
+    </div>
+    <div class="step" id="s3">
+      <div class="step-circle"><i class="fa-solid fa-money-bill-wave"></i></div>
+      <div class="step-label">ดำเนินการ</div>
+    </div>
+    <div class="step" id="s4">
+      <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+      <div class="step-label">เสร็จสิ้น</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS SCREEN (hidden) -->
+<div class="success-wrap" id="successScreen" style="display:none">
+  <div class="success-ring">✅</div>
+  <h2>ชำระเงินสำเร็จ!</h2>
+  <p>ขอบคุณที่ใช้บริการ<br>กรุณาเก็บใบเสร็จไว้เป็นหลักฐาน</p>
+  <div class="receipt" id="receiptEl"></div>
+  <div class="action-btns">
+    <button class="btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> พิมพ์ใบเสร็จ</button>
+    <a class="btn-new" href="fashion-pos.html"><i class="fa-solid fa-plus"></i> รายการใหม่</a>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout" id="mainLayout">
+
+  <!-- LEFT: STEP PANELS -->
+  <div>
+
+    <!-- STEP 1: ORDER SUMMARY -->
+    <div class="step-panel active" id="panel1">
+      <div class="card">
+        <div class="card-title"><div class="ic"><i class="fa-solid fa-basket-shopping"></i></div>รายการสินค้า</div>
+        <div id="orderItems"></div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1.5px solid #f3f4f6;">
+          <div class="sum-row"><span>ยอดรวม</span><span id="p1Subtotal">฿0</span></div>
+          <div class="sum-row disc" id="p1DiscRow" style="display:none">
+            <span><i class="fa-solid fa-tag"></i> ส่วนลด</span><span id="p1Disc">-฿0</span>
+          </div>
+          <div class="sum-row total"><span>ยอดสุทธิ</span><span id="p1Total">฿0</span></div>
+        </div>
+        <button class="confirm-btn" onclick="goStep(2)">
+          <i class="fa-solid fa-arrow-right"></i> เลือกวิธีชำระเงิน
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: CHOOSE METHOD -->
+    <div class="step-panel" id="panel2">
+      <div class="card">
+        <div class="card-title"><div class="ic"><i class="fa-solid fa-credit-card"></i></div>เลือกวิธีชำระเงิน</div>
+        <div class="method-grid">
+          <div class="method-card" onclick="selectMethod('cash',this)">
+            <span class="m-icon">💵</span>
+            <div class="m-name">เงินสด</div>
+            <div class="m-desc">ชำระด้วยธนบัตรหรือเหรียญ</div>
+          </div>
+          <div class="method-card" onclick="selectMethod('qr',this)">
+            <span class="m-icon">📱</span>
+            <div class="m-name">QR PromptPay</div>
+            <div class="m-desc">สแกน QR แล้วโอนได้เลย</div>
+          </div>
+          <div class="method-card" onclick="selectMethod('card',this)">
+            <span class="m-icon">💳</span>
+            <div class="m-name">บัตรเครดิต/เดบิต</div>
+            <div class="m-desc">Visa, MasterCard, JCB</div>
+          </div>
+          <div class="method-card" onclick="selectMethod('transfer',this)">
+            <span class="m-icon">🏦</span>
+            <div class="m-name">โอนเงิน</div>
+            <div class="m-desc">โอนผ่านแอปธนาคาร</div>
+          </div>
+        </div>
+        <button class="confirm-btn" id="methodBtn" onclick="goStep(3)" disabled>
+          <i class="fa-solid fa-arrow-right"></i> ดำเนินการชำระ
+        </button>
+        <button class="back-btn" onclick="goStep(1)"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT ACTION -->
+    <div class="step-panel" id="panel3">
+
+      <!-- CASH -->
+      <div class="card" id="cashPanel" style="display:none">
+        <div class="card-title"><div class="ic">💵</div>ชำระด้วยเงินสด</div>
+        <div style="background:#f8fafc;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.85rem;color:var(--gr);font-weight:600;"><i class="fa-solid fa-receipt"></i> ยอดที่ต้องชำระ</span>
+          <span style="font-size:1.4rem;font-weight:800;color:var(--p);" id="cashDue">฿0</span>
+        </div>
+        <div class="received-display">
+          <div class="received-label">รับเงินมา (บาท)</div>
+          <div class="received-amount" id="receivedDisplay">0</div>
+        </div>
+        <div class="quick-btns" id="quickBtns"></div>
+        <div class="numpad" id="numpad"></div>
+        <div class="change-box" id="changeBox">
+          <div class="change-label"><i class="fa-solid fa-coins"></i> เงินทอน</div>
+          <div class="change-value" id="changeVal">฿0</div>
+        </div>
+        <button class="confirm-btn" id="cashConfirmBtn" onclick="confirmPayment()" disabled>
+          <i class="fa-solid fa-check-circle"></i> ยืนยันรับเงิน
+        </button>
+        <button class="back-btn" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+      </div>
+
+      <!-- QR -->
+      <div class="card" id="qrPanel" style="display:none">
+        <div class="card-title"><div class="ic">📱</div>สแกน QR PromptPay</div>
+        <div class="qr-wrap">
+          <p style="font-size:.82rem;color:var(--gr);margin-bottom:14px;">เปิดแอปธนาคารของคุณ → สแกน QR → ยืนยันการโอน</p>
+          <div class="amount-highlight" id="qrAmount">฿0</div>
+          <div style="font-size:.8rem;color:var(--gr);margin-bottom:14px;">หมายเลขพร้อมเพย์: <b>093-xxx-xxxx</b></div>
+          <div class="qr-frame">
+            <canvas id="qrCanvas" class="qr-inner" width="188" height="188"></canvas>
+            <div class="qr-scan-line"></div>
+          </div>
+          <div class="qr-timer" id="qrTimer"><i class="fa-regular fa-clock"></i> หมดเวลาใน <span id="qrCountdown">05:00</span></div>
+          <div class="bank-info">
+            <div class="bank-row"><span>ชื่อบัญชี</span><span>ร้านแฟชั่น เสื้อผ้า</span></div>
+            <div class="bank-row"><span>เลขพร้อมเพย์</span><span>093-xxx-xxxx <button class="copy-btn" onclick="copyText('0930000000')">คัดลอก</button></span></div>
+          </div>
+        </div>
+        <button class="confirm-btn" onclick="confirmPayment()">
+          <i class="fa-solid fa-check-circle"></i> ยืนยันโอนเงินแล้ว
+        </button>
+        <button class="back-btn" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+      </div>
+
+      <!-- CARD -->
+      <div class="card" id="cardPanel" style="display:none">
+        <div class="card-title"><div class="ic">💳</div>บัตรเครดิต / เดบิต</div>
+        <div class="card-visual" id="cardVisual">
+          <div class="card-chip"></div>
+          <div class="card-number" id="cardNumDisplay">•••• •••• •••• ••••</div>
+          <div class="card-bottom">
+            <div><div class="label">ชื่อผู้ถือบัตร</div><div id="cardNameDisplay">ชื่อของคุณ</div></div>
+            <div><div class="label">หมดอายุ</div><div id="cardExpDisplay">MM/YY</div></div>
+          </div>
+          <div class="card-logo"><i class="fa-brands fa-cc-visa"></i></div>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-hashtag" style="color:var(--p)"></i> หมายเลขบัตร</label>
+          <input type="text" id="cardNum" maxlength="19" placeholder="0000 0000 0000 0000" oninput="formatCard(this)" autocomplete="cc-number"/>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-user" style="color:var(--ac)"></i> ชื่อผู้ถือบัตร</label>
+          <input type="text" id="cardName" placeholder="FIRSTNAME LASTNAME" oninput="document.getElementById('cardNameDisplay').textContent=this.value||'ชื่อของคุณ'" autocomplete="cc-name"/>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-calendar" style="color:var(--ok)"></i> วันหมดอายุ</label>
+            <input type="text" id="cardExp" maxlength="5" placeholder="MM/YY" oninput="formatExp(this)" autocomplete="cc-exp"/>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock" style="color:var(--warn)"></i> CVV</label>
+            <input type="password" id="cardCvv" maxlength="3" placeholder="•••" autocomplete="cc-csc"/>
+          </div>
+        </div>
+        <button class="confirm-btn" onclick="submitCard()">
+          <i class="fa-solid fa-shield-halved"></i> ชำระเงิน <span id="cardAmtBtn">฿0</span>
+        </button>
+        <button class="back-btn" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+      </div>
+
+      <!-- TRANSFER -->
+      <div class="card" id="transferPanel" style="display:none">
+        <div class="card-title"><div class="ic">🏦</div>โอนเงินผ่านธนาคาร</div>
+        <p style="font-size:.82rem;color:var(--gr);margin-bottom:14px;">เลือกธนาคารที่ต้องการโอน จากนั้นโอนเงินและอัปโหลดสลิป</p>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--p);text-align:center;margin-bottom:14px;" id="transferAmt">฿0</div>
+        <div class="bank-card sel" onclick="selectBank(this,'ธนาคารกสิกรไทย')">
+          <div class="bank-logo" style="background:#00a651;color:#fff">🏦</div>
+          <div class="bank-details">
+            <div class="bank-name">ธนาคารกสิกรไทย (KBank)</div>
+            <div class="bank-acc">ชื่อบัญชี: ร้านแฟชั่น เสื้อผ้า</div>
+            <div class="bank-acct-num">123-4-56789-0</div>
+          </div>
+          <i class="fa-solid fa-check-circle" style="color:#10b981;font-size:1.1rem"></i>
+        </div>
+        <div class="bank-card" onclick="selectBank(this,'ธนาคารกรุงไทย')">
+          <div class="bank-logo" style="background:#009fe3;color:#fff">🏛️</div>
+          <div class="bank-details">
+            <div class="bank-name">ธนาคารกรุงไทย (KTB)</div>
+            <div class="bank-acc">ชื่อบัญชี: ร้านแฟชั่น เสื้อผ้า</div>
+            <div class="bank-acct-num">987-6-54321-0</div>
+          </div>
+          <i class="fa-solid fa-circle" style="color:#e5e7eb;font-size:1.1rem"></i>
+        </div>
+        <div class="bank-card" onclick="selectBank(this,'ธนาคารไทยพาณิชย์')">
+          <div class="bank-logo" style="background:#4e2382;color:#fff">🏢</div>
+          <div class="bank-details">
+            <div class="bank-name">ธนาคารไทยพาณิชย์ (SCB)</div>
+            <div class="bank-acc">ชื่อบัญชี: ร้านแฟชั่น เสื้อผ้า</div>
+            <div class="bank-acct-num">456-7-89012-3</div>
+          </div>
+          <i class="fa-solid fa-circle" style="color:#e5e7eb;font-size:1.1rem"></i>
+        </div>
+        <label class="slip-upload" for="slipFile">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <div class="su-text">อัปโหลดสลิปการโอนเงิน</div>
+          <div class="su-sub">คลิกหรือลากไฟล์มาวางที่นี่ · JPG, PNG, PDF</div>
+        </label>
+        <input type="file" id="slipFile" accept="image/*,.pdf" style="display:none" onchange="previewSlip(this)"/>
+        <div id="slipPreview"><img id="slipImg" src="" alt="slip"/><p style="font-size:.75rem;color:var(--ok);margin-top:6px;font-weight:600"><i class="fa-solid fa-check"></i> อัปโหลดสลิปแล้ว</p></div>
+        <button class="confirm-btn" id="transferBtn" onclick="confirmPayment()">
+          <i class="fa-solid fa-paper-plane"></i> ยืนยันการโอนเงิน
+        </button>
+        <button class="back-btn" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+      </div>
+
+    </div><!-- /panel3 -->
+  </div><!-- /left -->
+
+  <!-- RIGHT: ORDER SUMMARY SIDEBAR -->
+  <div>
+    <div class="card" id="sideCard">
+      <div class="card-title"><div class="ic"><i class="fa-solid fa-receipt"></i></div>สรุปยอดชำระ</div>
+      <div id="sideItems" style="margin-bottom:14px;max-height:200px;overflow-y:auto;"></div>
+      <div class="sum-row"><span style="color:var(--gr)">ยอดรวม</span><span id="sideSubtotal">฿0</span></div>
+      <div class="sum-row disc" id="sideDiscRow" style="display:none">
+        <span><i class="fa-solid fa-tag"></i> ส่วนลด</span><span id="sideDisc">-฿0</span>
+      </div>
+      <div class="sum-row total"><span>ยอดสุทธิ</span><span id="sideTotal">฿0</span></div>
+      <div style="background:var(--pl);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.8rem;color:var(--p);font-weight:600;" id="sideMethod">
+        <i class="fa-solid fa-circle-info"></i> กรุณาเลือกวิธีชำระเงิน
+      </div>
+    </div>
+    <div style="margin-top:14px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+      <div style="font-size:.78rem;font-weight:700;color:var(--gr);margin-bottom:10px;"><i class="fa-solid fa-shield-halved" style="color:var(--ok)"></i> &nbsp;รับประกันความปลอดภัย</div>
+      <div style="font-size:.75rem;color:#94a3b8;line-height:1.8;">
+        <div><i class="fa-solid fa-lock" style="color:var(--ok)"></i> ข้อมูลถูกเข้ารหัส SSL 256-bit</div>
+        <div><i class="fa-solid fa-shield" style="color:var(--ok)"></i> ปลอดภัยทุกธุรกรรม</div>
+        <div><i class="fa-solid fa-rotate-left" style="color:var(--ok)"></i> คืนสินค้าได้ภายใน 7 วัน</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+// ── Clock ──
+setInterval(()=>{
+  document.getElementById('clockBar').textContent = new Date().toLocaleString('th-TH',{weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+// ── Load order from localStorage ──
+const order = JSON.parse(localStorage.getItem('pendingOrder') || 'null') || getDemoOrder();
+function getDemoOrder(){
+  return {
+    items:[
+      {icon:'👕',name:'เสื้อยืด Basic',size:'M',qty:2,price:290},
+      {icon:'👖',name:'กางเกงยีนส์ Slim',size:'32',qty:1,price:990},
+      {icon:'👗',name:'กระโปรง Midi',size:'S',qty:1,price:690},
+    ],
+    subtotal:2260, discountAmt:0, discountLabel:'', grandTotal:2260
+  };
+}
+
+let currentStep = 1;
+let selectedMethod = '';
+let receivedCash = '';
+let qrTimer = null;
+
+// ── Render order ──
+function renderOrder(){
+  const items = order.items;
+  document.getElementById('orderItems').innerHTML = items.map(i=>`
+    <div class="order-item">
+      <div class="oi-icon">${i.icon}</div>
+      <div class="oi-info">
+        <div class="oi-name">${i.name}</div>
+        <div class="oi-sub">ไซส์: ${i.size} × ${i.qty}</div>
+      </div>
+      <div class="oi-price">฿${(i.price*i.qty).toLocaleString()}</div>
+    </div>
+  `).join('');
+  document.getElementById('p1Subtotal').textContent = `฿${order.subtotal.toLocaleString()}`;
+  document.getElementById('p1Total').textContent = `฿${order.grandTotal.toLocaleString()}`;
+  if(order.discountAmt>0){
+    document.getElementById('p1DiscRow').style.display='flex';
+    document.getElementById('p1Disc').textContent = `-฿${order.discountAmt.toLocaleString()}`;
+  }
+  // side
+  document.getElementById('sideItems').innerHTML = items.map(i=>`
+    <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;border-bottom:1px solid #f3f4f6">
+      <span>${i.icon} ${i.name} ×${i.qty}</span>
+      <span style="font-weight:600">฿${(i.price*i.qty).toLocaleString()}</span>
+    </div>
+  `).join('');
+  document.getElementById('sideSubtotal').textContent = `฿${order.subtotal.toLocaleString()}`;
+  document.getElementById('sideTotal').textContent = `฿${order.grandTotal.toLocaleString()}`;
+  if(order.discountAmt>0){
+    document.getElementById('sideDiscRow').style.display='flex';
+    document.getElementById('sideDisc').textContent = `-฿${order.discountAmt.toLocaleString()}`;
+  }
+  document.getElementById('cashDue').textContent = `฿${order.grandTotal.toLocaleString()}`;
+  document.getElementById('qrAmount').textContent = `฿${order.grandTotal.toLocaleString()}`;
+  document.getElementById('transferAmt').textContent = `฿${order.grandTotal.toLocaleString()}`;
+  document.getElementById('cardAmtBtn').textContent = `฿${order.grandTotal.toLocaleString()}`;
+}
+
+// ── Steps ──
+function goStep(n){
+  currentStep = n;
+  document.querySelectorAll('.step-panel').forEach((p,i)=>{
+    p.classList.toggle('active', i+1===n);
+  });
+  [1,2,3,4].forEach(i=>{
+    const el = document.getElementById('s'+i);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    else if(i===n) el.classList.add('active');
+  });
+  if(n===3) initPaymentPanel();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Method selection ──
+function selectMethod(m, el){
+  selectedMethod = m;
+  document.querySelectorAll('.method-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('methodBtn').disabled = false;
+  const labels = {cash:'💵 เงินสด',qr:'📱 QR PromptPay',card:'💳 บัตรเครดิต/เดบิต',transfer:'🏦 โอนเงิน'};
+  document.getElementById('sideMethod').innerHTML = `<i class="fa-solid fa-check-circle"></i> วิธีชำระ: ${labels[m]}`;
+}
+
+// ── Init payment panel ──
+function initPaymentPanel(){
+  ['cash','qr','card','transfer'].forEach(m=>{
+    document.getElementById(m+'Panel').style.display = m===selectedMethod?'block':'none';
+  });
+  if(selectedMethod==='cash') initCash();
+  if(selectedMethod==='qr') initQR();
+}
+
+// ── CASH ──
+function initCash(){
+  receivedCash = '';
+  updateCashDisplay();
+  const grand = order.grandTotal;
+  const rounds = [grand, Math.ceil(grand/100)*100, Math.ceil(grand/500)*500, Math.ceil(grand/1000)*1000].filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+  document.getElementById('quickBtns').innerHTML = rounds.map(r=>`
+    <button class="quick-btn" onclick="setCash(${r})">฿${r.toLocaleString()}</button>
+  `).join('');
+  const pad = ['7','8','9','4','5','6','1','2','3','0','0','⌫'];
+  document.getElementById('numpad').innerHTML = pad.map((k,i)=>{
+    if(k==='0'&&i===10) return `<button class="num-btn zero" onclick="typeNum('0')">0</button>`;
+    if(k==='⌫') return `<button class="num-btn del" onclick="delNum()"><i class="fa-solid fa-delete-left"></i></button>`;
+    if(k==='0'&&i===9) return '';
+    return `<button class="num-btn" onclick="typeNum('${k}')">${k}</button>`;
+  }).join('');
+}
+function typeNum(d){
+  if(receivedCash.length>=9) return;
+  receivedCash += d; updateCashDisplay();
+}
+function delNum(){
+  receivedCash = receivedCash.slice(0,-1); updateCashDisplay();
+}
+function setCash(v){
+  receivedCash = String(v); updateCashDisplay();
+}
+function updateCashDisplay(){
+  const v = parseInt(receivedCash)||0;
+  const grand = order.grandTotal;
+  document.getElementById('receivedDisplay').textContent = v?v.toLocaleString():'0';
+  const change = v - grand;
+  const box = document.getElementById('changeBox');
+  document.getElementById('changeVal').textContent = change>=0 ? `฿${change.toLocaleString()}` : `ขาดอีก ฿${Math.abs(change).toLocaleString()}`;
+  box.className = 'change-box' + (change<0?' over':'');
+  box.querySelector('.change-label').innerHTML = change>=0 ?
+    '<i class="fa-solid fa-coins"></i> เงินทอน' :
+    '<i class="fa-solid fa-triangle-exclamation"></i> รับเงินมาไม่พอ';
+  document.getElementById('cashConfirmBtn').disabled = change<0 || v===0;
+}
+
+// ── QR ──
+function initQR(){
+  drawQR();
+  let secs = 300;
+  clearInterval(qrTimer);
+  qrTimer = setInterval(()=>{
+    secs--;
+    const m=String(Math.floor(secs/60)).padStart(2,'0');
+    const s=String(secs%60).padStart(2,'0');
+    document.getElementById('qrCountdown').textContent=`${m}:${s}`;
+    if(secs<=0){ clearInterval(qrTimer); document.getElementById('qrCountdown').textContent='หมดเวลา'; }
+  },1000);
+}
+function drawQR(){
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 188; const cell = Math.floor(size/25);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
+  const data = generateQRData(25);
+  data.forEach((row,r)=>row.forEach((v,c)=>{
+    ctx.fillStyle = v?'#1e1b4b':'#fff';
+    ctx.fillRect(c*cell,r*cell,cell,cell);
+  }));
+  // corners
+  [[0,0],[0,18],[18,0]].forEach(([r,c])=>{
+    ctx.strokeStyle='#1e1b4b'; ctx.lineWidth=2;
+    ctx.strokeRect(c*cell+1,r*cell+1,cell*7-2,cell*7-2);
+    ctx.fillStyle='#1e1b4b';
+    ctx.fillRect(c*cell+cell*2,r*cell+cell*2,cell*3,cell*3);
+  });
+}
+function generateQRData(n){
+  const d=[]; for(let i=0;i<n;i++){ d.push([]); for(let j=0;j<n;j++) d[i].push(Math.random()>.5); }
+  return d;
+}
+
+// ── CARD ──
+function formatCard(el){
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  const display = v.padEnd(16,'•').replace(/(.{4})/g,'$1 ').trim();
+  document.getElementById('cardNumDisplay').textContent = display;
+  const logo = v.startsWith('4')?'fa-brands fa-cc-visa':v.startsWith('5')?'fa-brands fa-cc-mastercard':'fa-brands fa-cc-visa';
+  document.querySelector('.card-logo').innerHTML = `<i class="${logo}"></i>`;
+}
+function formatExp(el){
+  let v = el.value.replace(/\D/g,'').slice(0,4);
+  if(v.length>=2) v = v.slice(0,2)+'/'+v.slice(2);
+  el.value = v;
+  document.getElementById('cardExpDisplay').textContent = v||'MM/YY';
+}
+function submitCard(){
+  const num = document.getElementById('cardNum').value.replace(/\s/g,'');
+  const exp = document.getElementById('cardExp').value;
+  const cvv = document.getElementById('cardCvv').value;
+  if(num.length<16){ alert('กรุณากรอกหมายเลขบัตรให้ครบ 16 หลัก'); return; }
+  if(exp.length<5){ alert('กรุณากรอกวันหมดอายุ'); return; }
+  if(cvv.length<3){ alert('กรุณากรอก CVV'); return; }
+  const btn = document.querySelector('#cardPanel .confirm-btn');
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังประมวลผล...';
+  btn.disabled = true;
+  setTimeout(confirmPayment, 2000);
+}
+
+// ── Bank selection ──
+function selectBank(el, name){
+  document.querySelectorAll('.bank-card').forEach(c=>{
+    c.classList.remove('sel');
+    c.querySelector('i').className='fa-solid fa-circle';
+    c.querySelector('i').style.color='#e5e7eb';
+  });
+  el.classList.add('sel');
+  el.querySelector('i').className='fa-solid fa-check-circle';
+  el.querySelector('i').style.color='#10b981';
+}
+function previewSlip(input){
+  if(!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.getElementById('slipImg').src = e.target.result;
+    document.getElementById('slipPreview').style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── Confirm ──
+function confirmPayment(){
+  clearInterval(qrTimer);
+  const methodLabels = {cash:'เงินสด',qr:'QR PromptPay',card:'บัตรเครดิต/เดบิต',transfer:'โอนเงิน'};
+  const extra = selectedMethod==='cash' ? ` (รับ ฿${parseInt(receivedCash).toLocaleString()} / ทอน ฿${(parseInt(receivedCash)-order.grandTotal).toLocaleString()})` : '';
+  const receiptNo = 'PMT'+Date.now().toString().slice(-8);
+  const now = new Date();
+
+  // Save to history
+  const hist = JSON.parse(localStorage.getItem('paymentHistory')||'[]');
+  hist.push({ id:receiptNo, date:now.toLocaleString('th-TH'), items:order.items, subtotal:order.subtotal, discount:order.discountAmt, total:order.grandTotal, method:methodLabels[selectedMethod] });
+  localStorage.setItem('paymentHistory', JSON.stringify(hist));
+  localStorage.removeItem('pendingOrder');
+
+  // Build receipt
+  document.getElementById('receiptEl').innerHTML = `
+    <div class="receipt-logo">
+      <div style="font-size:1.6rem;margin-bottom:4px">👗</div>
+      <div class="shop">ร้านแฟชั่นเสื้อผ้า</div>
+      <div class="date">${now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})} · ${now.toLocaleTimeString('th-TH')}</div>
+      <div class="date">เลขที่: ${receiptNo}</div>
+    </div>
+    <hr class="r-divider"/>
+    ${order.items.map(i=>`<div class="r-item"><span class="r-item-name">${i.icon} ${i.name} (${i.size}) ×${i.qty}</span><span class="r-item-price">฿${(i.price*i.qty).toLocaleString()}</span></div>`).join('')}
+    <hr class="r-divider"/>
+    <div class="r-row"><span>ยอดรวม</span><span>฿${order.subtotal.toLocaleString()}</span></div>
+    ${order.discountAmt>0?`<div class="r-row" style="color:var(--ok)"><span>ส่วนลด</span><span>-฿${order.discountAmt.toLocaleString()}</span></div>`:''}
+    <div class="r-total"><span>ยอดสุทธิ</span><span>฿${order.grandTotal.toLocaleString()}</span></div>
+    <div class="r-method"><i class="fa-solid fa-check-circle"></i> ชำระโดย: ${methodLabels[selectedMethod]}${extra}</div>
+    <div class="r-thanks">ขอบคุณที่อุดหนุน 💜<br>ยินดีคืนสินค้าภายใน 7 วัน<br>โทร. 02-xxx-xxxx</div>
+  `;
+
+  // Show success
+  document.getElementById('mainLayout').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+  goStep(4);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Copy ──
+function copyText(t){
+  navigator.clipboard?.writeText(t).then(()=>alert('คัดลอกแล้ว: '+t)).catch(()=>alert(t));
+}
+
+// ── Init ──
+renderOrder();
+</script>
+</body>
+</html>

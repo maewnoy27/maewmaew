@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แดชบอร์ดผลแบบสอบถาม – แอดมิน</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary:#7c3aed; --primary-light:#ede9fe; --accent:#ec4899;
+      --success:#10b981; --warn:#f59e0b; --danger:#ef4444;
+      --dark:#1e1b4b; --gray:#64748b; --bg:#f5f3ff;
+      --sidebar-w:240px;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--dark); display:flex; min-height:100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width:var(--sidebar-w); background:linear-gradient(180deg,#1e1b4b 0%,#312e81 100%);
+      display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:100;
+    }
+    .sidebar-logo {
+      padding:24px 20px 20px; border-bottom:1px solid rgba(255,255,255,.1);
+      display:flex; align-items:center; gap:10px; color:#fff;
+    }
+    .sidebar-logo .logo-icon {
+      width:38px; height:38px; background:linear-gradient(135deg,#7c3aed,#ec4899);
+      border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+    }
+    .sidebar-logo span { font-size:.95rem; font-weight:700; line-height:1.3; }
+    .sidebar-logo small { color:rgba(255,255,255,.5); font-size:.72rem; font-weight:400; }
+    .sidebar-nav { padding:16px 12px; flex:1; }
+    .nav-label { font-size:.68rem; color:rgba(255,255,255,.4); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin:16px 0 6px 8px; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+      color:rgba(255,255,255,.7); font-size:.88rem; font-weight:600; cursor:pointer;
+      transition:all .2s; text-decoration:none; margin-bottom:2px;
+    }
+    .nav-item i { width:18px; text-align:center; }
+    .nav-item:hover, .nav-item.active { background:rgba(255,255,255,.12); color:#fff; }
+    .nav-item.active { background:linear-gradient(135deg,rgba(124,58,237,.6),rgba(236,72,153,.4)); color:#fff; }
+    .sidebar-footer {
+      padding:14px 16px; border-top:1px solid rgba(255,255,255,.1);
+      font-size:.75rem; color:rgba(255,255,255,.35); text-align:center;
+    }
+
+    /* ── MAIN ── */
+    .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+    .topbar {
+      background:#fff; padding:14px 28px; display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid #e9e7ff; box-shadow:0 1px 8px rgba(124,58,237,.07);
+      position:sticky; top:0; z-index:50;
+    }
+    .topbar-left h2 { font-size:1.1rem; font-weight:700; color:var(--dark); }
+    .topbar-left p { font-size:.78rem; color:var(--gray); margin-top:1px; }
+    .topbar-right { display:flex; align-items:center; gap:10px; }
+    .btn {
+      display:inline-flex; align-items:center; gap:7px; padding:8px 18px; border-radius:8px;
+      border:none; cursor:pointer; font-size:.83rem; font-weight:600; transition:all .2s;
+    }
+    .btn-primary { background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff; box-shadow:0 3px 12px rgba(124,58,237,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 5px 18px rgba(124,58,237,.4); }
+    .btn-ghost { background:#f1f5f9; color:var(--gray); border:1.5px solid #e2e8f0; }
+    .btn-ghost:hover { background:#e2e8f0; }
+    .btn-danger { background:#fee2e2; color:var(--danger); border:1.5px solid #fca5a5; }
+    .btn-danger:hover { background:#fca5a5; color:#fff; }
+
+    /* ── CONTENT ── */
+    .content { padding:26px 28px; flex:1; overflow-y:auto; }
+
+    /* ── EMPTY ── */
+    .empty-state {
+      text-align:center; padding:80px 20px;
+    }
+    .empty-state .empty-icon { font-size:4rem; margin-bottom:16px; opacity:.5; }
+    .empty-state h3 { font-size:1.2rem; color:var(--gray); margin-bottom:8px; }
+    .empty-state p { color:#94a3b8; font-size:.88rem; }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+    .kpi-card {
+      background:#fff; border-radius:16px; padding:20px; box-shadow:0 2px 12px rgba(124,58,237,.07);
+      border:1px solid rgba(124,58,237,.07); display:flex; flex-direction:column; gap:8px;
+    }
+    .kpi-header { display:flex; justify-content:space-between; align-items:flex-start; }
+    .kpi-icon {
+      width:44px; height:44px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+    }
+    .kpi-value { font-size:2rem; font-weight:800; color:var(--dark); line-height:1; }
+    .kpi-label { font-size:.8rem; color:var(--gray); font-weight:600; }
+    .kpi-sub { font-size:.75rem; color:var(--success); display:flex; align-items:center; gap:4px; }
+
+    /* ── RATING BARS ── */
+    .section-title { font-size:1rem; font-weight:700; color:var(--dark); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+    .card { background:#fff; border-radius:16px; padding:22px; box-shadow:0 2px 12px rgba(124,58,237,.07); border:1px solid rgba(124,58,237,.07); }
+
+    .rating-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .rating-label { width:160px; font-size:.83rem; font-weight:600; color:#374151; display:flex; align-items:center; gap:6px; }
+    .rating-bar-wrap { flex:1; background:#f3f4f6; border-radius:99px; height:10px; overflow:hidden; }
+    .rating-bar { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--primary),var(--accent)); transition:width .8s; }
+    .rating-score { width:36px; font-size:.88rem; font-weight:700; color:var(--primary); text-align:right; }
+    .stars-display { color:var(--warn); font-size:.75rem; }
+
+    /* ── DONUT CHART ── */
+    .donut-wrap { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; }
+    .legend-item { display:flex; align-items:center; gap:7px; font-size:.8rem; font-weight:600; color:#374151; margin-bottom:6px; }
+    .legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+
+    /* ── NPS ── */
+    .nps-display { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .nps-box { border-radius:12px; padding:16px; text-align:center; }
+    .nps-box .num { font-size:1.8rem; font-weight:800; }
+    .nps-box .lbl { font-size:.75rem; font-weight:600; margin-top:4px; }
+    .nps-score { font-size:2.5rem; font-weight:900; text-align:center; margin-bottom:6px; }
+    .nps-tag { font-size:.8rem; font-weight:700; padding:4px 14px; border-radius:99px; display:inline-block; margin-bottom:12px; }
+
+    /* ── BAR CHART ── */
+    .bar-chart { display:flex; align-items:flex-end; gap:8px; height:120px; margin-top:8px; }
+    .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .bar-fill { width:100%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,var(--accent),var(--primary)); transition:height .8s; min-height:4px; }
+    .bar-x { font-size:.7rem; color:var(--gray); font-weight:600; }
+    .bar-n { font-size:.7rem; color:var(--gray); }
+
+    /* ── RESPONSES TABLE ── */
+    .table-wrap { overflow-x:auto; margin-top:24px; }
+    table { width:100%; border-collapse:collapse; font-size:.83rem; }
+    thead th {
+      background:var(--primary-light); color:var(--primary); padding:10px 14px;
+      font-weight:700; text-align:left; font-size:.78rem; white-space:nowrap;
+    }
+    tbody tr { border-bottom:1px solid #f1f5f9; transition:background .15s; }
+    tbody tr:hover { background:#faf5ff; }
+    tbody td { padding:11px 14px; color:#374151; vertical-align:top; }
+    .badge {
+      display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px;
+      font-size:.72rem; font-weight:700;
+    }
+    .badge-green { background:#d1fae5; color:#065f46; }
+    .badge-yellow { background:#fef3c7; color:#92400e; }
+    .badge-red { background:#fee2e2; color:#991b1b; }
+    .star-mini { color:var(--warn); font-size:.75rem; }
+    .tag { background:#f3f4f6; color:#374151; font-size:.72rem; padding:2px 8px; border-radius:6px; display:inline-block; margin:1px; }
+
+    /* ── WORD CLOUD ── */
+    .word-cloud { display:flex; flex-wrap:wrap; gap:8px; }
+    .word-tag {
+      padding:6px 14px; border-radius:99px; font-size:.8rem; font-weight:600;
+      background:var(--primary-light); color:var(--primary); cursor:default;
+    }
+
+    /* ── TABS ── */
+    .tab-bar { display:flex; gap:4px; background:#f1f5f9; border-radius:10px; padding:4px; margin-bottom:20px; }
+    .tab-btn {
+      flex:1; padding:8px; border-radius:7px; border:none; background:none; cursor:pointer;
+      font-size:.83rem; font-weight:600; color:var(--gray); transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .tab-btn.active { background:#fff; color:var(--primary); box-shadow:0 1px 6px rgba(0,0,0,.08); }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .sidebar{ display:none; }
+      .main{ margin-left:0; }
+      .grid-2{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fa-solid fa-chart-bar" style="color:#fff"></i></div>
+    <div><span>แดชบอร์ด<br><small>ผลแบบสอบถาม</small></span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">เมนูหลัก</div>
+    <a class="nav-item active" onclick="showTab('overview')"><i class="fa-solid fa-gauge-high"></i>ภาพรวม</a>
+    <a class="nav-item" onclick="showTab('ratings')"><i class="fa-solid fa-star"></i>คะแนนความพึงพอใจ</a>
+    <a class="nav-item" onclick="showTab('responses')"><i class="fa-solid fa-table-list"></i>รายการตอบ</a>
+    <div class="nav-label">จัดการ</div>
+    <a class="nav-item" href="survey-form.html"><i class="fa-solid fa-arrow-up-right-from-square"></i>เปิดแบบสอบถาม</a>
+    <a class="nav-item btn-danger" style="color:#fca5a5" onclick="clearData()"><i class="fa-solid fa-trash"></i>ล้างข้อมูล</a>
+  </nav>
+  <div class="sidebar-footer">
+    <i class="fa-regular fa-clock"></i> <span id="clock"></span>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2><i class="fa-solid fa-chart-pie" style="color:var(--primary)"></i> &nbsp;รายงานผลแบบสอบถาม</h2>
+      <p id="topbarSub">กำลังโหลดข้อมูล...</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> รีเฟรช</button>
+      <button class="btn btn-primary" onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> ส่งออก CSV</button>
+    </div>
+  </div>
+
+  <div class="content" id="mainContent">
+    <!-- empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📋</div>
+      <h3>ยังไม่มีข้อมูลแบบสอบถาม</h3>
+      <p>เปิด <a href="survey-form.html" style="color:var(--primary);font-weight:600">แบบสอบถาม</a> และกรอกข้อมูลเพื่อดูผลที่นี่</p>
+    </div>
+    <!-- dashboard (hidden until data) -->
+    <div id="dashboard" style="display:none">
+      <!-- TABS -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-overview')"><i class="fa-solid fa-gauge-high"></i>ภาพรวม</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-ratings')"><i class="fa-solid fa-star"></i>คะแนน</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-responses')"><i class="fa-solid fa-table-list"></i>รายการ</button>
+      </div>
+
+      <!-- ── TAB: OVERVIEW ── -->
+      <div class="tab-pane active" id="tab-overview">
+        <div class="kpi-grid" id="kpiGrid"></div>
+        <div class="grid-2">
+          <!-- Overall distribution -->
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-face-smile" style="color:var(--warn)"></i>การกระจายความพึงพอใจโดยรวม</div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <canvas id="donutCanvas" width="140" height="140"></canvas>
+              <div id="donutLegend"></div>
+            </div>
+          </div>
+          <!-- NPS -->
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-thumbs-up" style="color:var(--success)"></i>Net Promoter Score (NPS)</div>
+            <div style="text-align:center">
+              <div class="nps-score" id="npsScore">–</div>
+              <span class="nps-tag" id="npsTag">–</span>
+            </div>
+            <div class="nps-display" id="npsDisplay"></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <!-- Channels -->
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-share-nodes" style="color:var(--accent)"></i>ช่องทางที่พบร้าน</div>
+            <div id="channelChart"></div>
+          </div>
+          <!-- Best things word cloud -->
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary)"></i>สิ่งที่ประทับใจ</div>
+            <div class="word-cloud" id="wordCloud"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: RATINGS ── -->
+      <div class="tab-pane" id="tab-ratings">
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title"><i class="fa-solid fa-star" style="color:var(--warn)"></i>คะแนนเฉลี่ยแต่ละด้าน</div>
+          <div id="ratingBars"></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-chart-column" style="color:var(--primary)"></i>การกระจายคะแนนคุณภาพสินค้า</div>
+            <div class="bar-chart" id="qualityBar"></div>
+            <div style="display:flex;gap:8px;margin-top:4px" id="qualityBarX"></div>
+          </div>
+          <div class="card">
+            <div class="section-title"><i class="fa-solid fa-chart-column" style="color:var(--accent)"></i>การกระจายความถี่การซื้อ</div>
+            <div id="freqBars"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="section-title"><i class="fa-solid fa-screwdriver-wrench" style="color:var(--danger)"></i>สิ่งที่ต้องการให้ปรับปรุง</div>
+          <div class="word-cloud" id="improveCloud"></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: RESPONSES ── -->
+      <div class="tab-pane" id="tab-responses">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span id="respCount" style="font-size:.85rem;color:var(--gray)"></span>
+          <input type="text" id="searchBox" placeholder="🔍 ค้นหาชื่อ / ความเห็น..." style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:.83rem;outline:none;width:260px" oninput="renderTable()" />
+        </div>
+        <div class="table-wrap">
+          <table id="respTable">
+            <thead>
+              <tr>
+                <th>#</th><th><i class="fa-regular fa-user"></i> ชื่อ</th>
+                <th><i class="fa-regular fa-calendar"></i> วันที่</th>
+                <th><i class="fa-solid fa-star"></i> โดยรวม</th>
+                <th><i class="fa-solid fa-shirt"></i> คุณภาพ</th>
+                <th><i class="fa-solid fa-tags"></i> ราคา</th>
+                <th><i class="fa-solid fa-headset"></i> บริการ</th>
+                <th><i class="fa-solid fa-thumbs-up"></i> NPS</th>
+                <th><i class="fa-solid fa-comment"></i> ความเห็น</th>
+              </tr>
+            </thead>
+            <tbody id="respBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Clock ──
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('th-TH');
+},1000);
+
+// ── Data ──
+let responses = [];
+function load() {
+  responses = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+  if (!responses.length) return;
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('topbarSub').textContent =
+    `ข้อมูล ${responses.length} รายการ · อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+  renderAll();
+}
+
+function renderAll() {
+  renderKPI();
+  renderDonut();
+  renderNPS();
+  renderRatingBars();
+  renderQualityDist();
+  renderChannels();
+  renderWordCloud();
+  renderFreq();
+  renderImprove();
+  renderTable();
+}
+
+// ── KPI ──
+function avg(arr) { return arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0; }
+function renderKPI() {
+  const overall = avg(responses.map(r=>r.overall));
+  const quality = avg(responses.map(r=>r.ratings.quality));
+  const npsArr = responses.filter(r=>r.nps!==null).map(r=>r.nps);
+  const npsScore = npsArr.length ? Math.round(
+    (npsArr.filter(n=>n>=9).length - npsArr.filter(n=>n<=6).length) / npsArr.length * 100
+  ) : 0;
+  const kpis = [
+    { icon:'fa-users', bg:'#ede9fe', ic:'#7c3aed', val:responses.length, label:'ผู้ตอบทั้งหมด', sub:'คน', subIcon:'fa-arrow-up' },
+    { icon:'fa-star', bg:'#fef3c7', ic:'#f59e0b', val:overall.toFixed(1)+' / 5', label:'คะแนนเฉลี่ย', sub:'โดยรวม', subIcon:'' },
+    { icon:'fa-gem', bg:'#d1fae5', ic:'#10b981', val:quality.toFixed(1)+' / 5', label:'คุณภาพสินค้า', sub:'เฉลี่ย', subIcon:'' },
+    { icon:'fa-thumbs-up', bg:'#fce7f3', ic:'#ec4899', val:npsScore, label:'NPS Score', sub:'คะแนน', subIcon:'' },
+    { icon:'fa-comment-dots', bg:'#e0f2fe', ic:'#0284c7', val:responses.filter(r=>r.comment.trim()).length, label:'มีข้อเสนอแนะ', sub:'ราย', subIcon:'' },
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div>
+          <div class="kpi-value">${k.val}</div>
+          <div class="kpi-label">${k.label}</div>
+        </div>
+        <div class="kpi-icon" style="background:${k.bg}"><i class="fa-solid ${k.icon}" style="color:${k.ic}"></i></div>
+      </div>
+      <div class="kpi-sub"><i class="fa-solid fa-circle-check"></i> ${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ── Donut ──
+function renderDonut() {
+  const counts = [0,0,0,0,0];
+  responses.forEach(r=>{ if(r.overall>=1&&r.overall<=5) counts[r.overall-1]++; });
+  const labels = ['😞 แย่มาก','😕 แย่','😐 พอใช้','😊 ดี','🤩 ดีมาก'];
+  const colors = ['#ef4444','#f97316','#f59e0b','#22c55e','#10b981'];
+  const canvas = document.getElementById('donutCanvas');
+  const ctx = canvas.getContext('2d');
+  const total = counts.reduce((a,b)=>a+b,0) || 1;
+  const cx=70,cy=70,r=55,inner=30;
+  let angle = -Math.PI/2;
+  ctx.clearRect(0,0,140,140);
+  counts.forEach((c,i)=>{
+    const slice = (c/total)*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice);
+    ctx.closePath(); ctx.fillStyle=colors[i]; ctx.fill();
+    angle+=slice;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,inner,0,Math.PI*2);
+  ctx.fillStyle='#fff'; ctx.fill();
+  ctx.fillStyle=colors[4]; ctx.textAlign='center'; ctx.font='bold 13px Segoe UI';
+  ctx.fillText(total,cx,cy+5);
+  document.getElementById('donutLegend').innerHTML = labels.map((l,i)=>`
+    <div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div>${l} <b>(${counts[i]})</b></div>
+  `).join('');
+}
+
+// ── NPS ──
+function renderNPS() {
+  const npsArr = responses.filter(r=>r.nps!==null).map(r=>r.nps);
+  if(!npsArr.length){ document.getElementById('npsScore').textContent='–'; return; }
+  const det = npsArr.filter(n=>n<=6).length;
+  const pas = npsArr.filter(n=>n==7||n==8).length;
+  const pro = npsArr.filter(n=>n>=9).length;
+  const score = Math.round((pro-det)/npsArr.length*100);
+  const scoreEl = document.getElementById('npsScore');
+  scoreEl.textContent = score;
+  scoreEl.style.color = score>=50?'#10b981':score>=0?'#f59e0b':'#ef4444';
+  const tagEl = document.getElementById('npsTag');
+  if(score>=50){ tagEl.textContent='🏆 ยอดเยี่ยม'; tagEl.style.cssText='background:#d1fae5;color:#065f46'; }
+  else if(score>=0){ tagEl.textContent='👍 ดี'; tagEl.style.cssText='background:#fef3c7;color:#92400e'; }
+  else{ tagEl.textContent='⚠️ ต้องปรับปรุง'; tagEl.style.cssText='background:#fee2e2;color:#991b1b'; }
+  document.getElementById('npsDisplay').innerHTML = `
+    <div class="nps-box" style="background:#fee2e2"><div class="num" style="color:#ef4444">${det}</div><div class="lbl" style="color:#991b1b">😣 ผู้ต่อต้าน<br>(0-6)</div></div>
+    <div class="nps-box" style="background:#fef3c7"><div class="num" style="color:#f59e0b">${pas}</div><div class="lbl" style="color:#92400e">😐 เฉยๆ<br>(7-8)</div></div>
+    <div class="nps-box" style="background:#d1fae5"><div class="num" style="color:#10b981">${pro}</div><div class="lbl" style="color:#065f46">😍 ผู้ส่งเสริม<br>(9-10)</div></div>
+  `;
+}
+
+// ── Rating Bars ──
+function renderRatingBars() {
+  const dims = [
+    { key:'quality', label:'คุณภาพสินค้า', icon:'fa-shirt', color:'var(--primary)' },
+    { key:'price', label:'ความคุ้มค่าราคา', icon:'fa-tags', color:'var(--accent)' },
+    { key:'service', label:'การบริการ', icon:'fa-headset', color:'var(--success)' },
+    { key:'store', label:'บรรยากาศร้าน', icon:'fa-store', color:'var(--warn)' },
+    { key:'variety', label:'ความหลากหลาย', icon:'fa-layer-group', color:'#8b5cf6' },
+  ];
+  document.getElementById('ratingBars').innerHTML = dims.map(d=>{
+    const sc = avg(responses.map(r=>r.ratings[d.key]));
+    const pct = sc/5*100;
+    const stars = '★'.repeat(Math.round(sc))+'☆'.repeat(5-Math.round(sc));
+    return `
+      <div class="rating-row">
+        <div class="rating-label"><i class="fa-solid ${d.icon}" style="color:${d.color}"></i>${d.label}</div>
+        <div class="rating-bar-wrap"><div class="rating-bar" style="width:${pct}%;background:linear-gradient(90deg,${d.color},${d.color}99)"></div></div>
+        <div class="rating-score">${sc.toFixed(1)}</div>
+        <div class="stars-display">${stars}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Quality Distribution bar chart ──
+function renderQualityDist() {
+  const counts = [0,0,0,0,0];
+  responses.forEach(r=>{ if(r.ratings.quality>=1) counts[r.ratings.quality-1]++; });
+  const max = Math.max(...counts,1);
+  const colors=['#ef4444','#f97316','#f59e0b','#22c55e','#10b981'];
+  const el = document.getElementById('qualityBar');
+  el.innerHTML = counts.map((c,i)=>`
+    <div class="bar-col">
+      <span class="bar-n">${c}</span>
+      <div class="bar-fill" style="height:${Math.max(c/max*100,4)}px;background:${colors[i]}"></div>
+      <span class="bar-x">${'★'.repeat(i+1)}</span>
+    </div>
+  `).join('');
+}
+
+// ── Channels ──
+function renderChannels() {
+  const map = {};
+  responses.forEach(r=>r.channels.forEach(c=>{ map[c]=(map[c]||0)+1; }));
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1]||1;
+  const icons = { Facebook:'fa-brands fa-facebook', Instagram:'fa-brands fa-instagram', TikTok:'fa-brands fa-tiktok', Google:'fa-brands fa-google', 'เพื่อนแนะนำ':'fa-solid fa-user-group', 'ป้ายโฆษณา':'fa-solid fa-signs-post', 'เดินผ่าน':'fa-solid fa-person-walking' };
+  document.getElementById('channelChart').innerHTML = sorted.map(([ch,n])=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;margin-bottom:4px">
+        <span><i class="${icons[ch]||'fa-solid fa-circle-dot'}" style="color:var(--primary);margin-right:5px"></i>${ch}</span>
+        <span style="color:var(--gray)">${n} คน</span>
+      </div>
+      <div style="height:8px;background:#f3f4f6;border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${n/max*100}%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:99px"></div>
+      </div>
+    </div>
+  `).join('') || '<p style="color:#aaa;font-size:.85rem">ไม่มีข้อมูล</p>';
+}
+
+// ── Word Cloud ──
+function renderWordCloud() {
+  const map = {};
+  responses.forEach(r=>r.bestThings.forEach(t=>{ map[t]=(map[t]||0)+1; }));
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('wordCloud').innerHTML = sorted.map(([t,n])=>`
+    <span class="word-tag" style="font-size:${.75+n*.08}rem">${t} <b>(${n})</b></span>
+  `).join('') || '<p style="color:#aaa;font-size:.85rem">ไม่มีข้อมูล</p>';
+}
+
+// ── Frequency ──
+function renderFreq() {
+  const map = {};
+  responses.forEach(r=>{ if(r.freq) map[r.freq]=(map[r.freq]||0)+1; });
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1]||1;
+  document.getElementById('freqBars').innerHTML = sorted.map(([f,n])=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:110px;font-size:.8rem;font-weight:600;color:#374151">${f}</div>
+      <div style="flex:1;height:26px;background:#f3f4f6;border-radius:8px;overflow:hidden">
+        <div style="height:100%;width:${n/max*100}%;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:8px;display:flex;align-items:center;padding-left:8px">
+          <span style="color:#fff;font-size:.75rem;font-weight:700">${n}</span>
+        </div>
+      </div>
+    </div>
+  `).join('') || '<p style="color:#aaa;font-size:.85rem">ไม่มีข้อมูล</p>';
+}
+
+// ── Improve Cloud ──
+function renderImprove() {
+  const map = {};
+  responses.forEach(r=>r.improvements.forEach(t=>{ map[t]=(map[t]||0)+1; }));
+  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('improveCloud').innerHTML = sorted.map(([t,n])=>`
+    <span class="word-tag" style="background:#fee2e2;color:#991b1b;font-size:${.75+n*.08}rem">${t} <b>(${n})</b></span>
+  `).join('') || '<p style="color:#aaa;font-size:.85rem">ไม่มีข้อมูล</p>';
+}
+
+// ── Table ──
+function renderTable() {
+  const q = (document.getElementById('searchBox')?.value||'').toLowerCase();
+  const filtered = responses.filter(r=>
+    r.name.toLowerCase().includes(q)||r.comment.toLowerCase().includes(q)||r.email.toLowerCase().includes(q)
+  );
+  document.getElementById('respCount').textContent = `แสดง ${filtered.length} / ${responses.length} รายการ`;
+  const starsHtml = n => '★'.repeat(n)+'☆'.repeat(5-n);
+  const npsBadge = n => {
+    if(n===null) return '–';
+    const cls = n>=9?'badge-green':n>=7?'badge-yellow':'badge-red';
+    return `<span class="badge ${cls}">${n}</span>`;
+  };
+  const overallBadge = n => {
+    const cls = n>=4?'badge-green':n>=3?'badge-yellow':'badge-red';
+    const emoji = ['','😞','😕','😐','😊','🤩'][n]||'';
+    return `<span class="badge ${cls}">${emoji} ${n}/5</span>`;
+  };
+  document.getElementById('respBody').innerHTML = filtered.length ? filtered.slice().reverse().map((r,i)=>`
+    <tr>
+      <td style="color:var(--gray)">${filtered.length-i}</td>
+      <td><b>${r.name}</b>${r.email?`<br><span style="font-size:.72rem;color:var(--gray)">${r.email}</span>`:''}</td>
+      <td style="white-space:nowrap;color:var(--gray);font-size:.78rem">${r.submittedAt}</td>
+      <td>${overallBadge(r.overall)}</td>
+      <td><span class="star-mini">${starsHtml(r.ratings.quality)}</span></td>
+      <td><span class="star-mini">${starsHtml(r.ratings.price)}</span></td>
+      <td><span class="star-mini">${starsHtml(r.ratings.service)}</span></td>
+      <td>${npsBadge(r.nps)}</td>
+      <td style="max-width:180px;font-size:.78rem;color:#374151">${r.comment||'<span style="color:#ccc">–</span>'}</td>
+    </tr>
+  `).join('') : `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">ไม่พบข้อมูล</td></tr>`;
+}
+
+// ── Tabs ──
+function switchTab(btn, paneId) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.add('active');
+}
+function showTab(name) {
+  const map = { overview:'tab-overview', ratings:'tab-ratings', responses:'tab-responses' };
+  const pane = map[name]; if(!pane) return;
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach((b,i)=>{ b.classList.remove('active'); if(Object.keys(map)[i]===name) b.classList.add('active'); });
+  document.querySelectorAll('.tab-pane').forEach(p=>{ p.classList.toggle('active', p.id===pane); });
+  // also update sidebar active
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+}
+
+// ── Export CSV ──
+function exportCSV() {
+  if(!responses.length){ alert('ไม่มีข้อมูล'); return; }
+  const headers = ['ลำดับ','ชื่อ','อีเมล','เพศ','ช่วงอายุ','ความถี่','ยอดใช้จ่าย','คุณภาพ','ราคา','บริการ','บรรยากาศ','ความหลากหลาย','โดยรวม','NPS','ความเห็น','วันที่'];
+  const rows = responses.map((r,i)=>[
+    i+1,r.name,r.email,r.gender,r.age,r.freq,r.spend,
+    r.ratings.quality,r.ratings.price,r.ratings.service,r.ratings.store,r.ratings.variety,
+    r.overall,r.nps??'',`"${r.comment.replace(/"/g,'""')}"`,r.submittedAt
+  ]);
+  const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `survey-results-${Date.now()}.csv`;
+  a.click();
+}
+
+// ── Clear ──
+function clearData() {
+  if(!confirm('ลบข้อมูลทั้งหมด? ไม่สามารถกู้คืนได้')) return;
+  localStorage.removeItem('surveyResponses');
+  location.reload();
+}
+
+// ── Init ──
+load();
+</script>
+</body>
+</html>

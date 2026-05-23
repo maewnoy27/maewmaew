@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>รีวิวจากลูกค้า – ร้านแฟชั่นเสื้อผ้า</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --p:#7c3aed;--pl:#ede9fe;--ac:#ec4899;--ok:#10b981;
+  --warn:#f59e0b;--dk:#1e1b4b;--gr:#64748b;--bg:#f5f3ff;
+  --red:#ef4444;--card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);
+  padding:40px 20px 100px;text-align:center;color:#fff;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:50px;
+  background:var(--bg);clip-path:ellipse(55% 100% at 50% 100%);
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;
+  font-size:.78rem;font-weight:600;margin-bottom:14px;
+}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:8px;letter-spacing:.3px;}
+.hero p{font-size:.95rem;opacity:.88;max-width:440px;margin:0 auto 20px;line-height:1.6;}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat .num{font-size:1.8rem;font-weight:800;}
+.hero-stat .lbl{font-size:.75rem;opacity:.75;margin-top:2px;}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 48px;}
+
+/* ── SUMMARY BAR ── */
+.summary-bar{
+  background:var(--card);border-radius:20px;padding:24px 28px;
+  box-shadow:0 2px 16px rgba(124,58,237,.08);margin-top:-50px;margin-bottom:24px;
+  display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+}
+.avg-score{text-align:center;padding-right:24px;border-right:1px solid #f3f4f6;}
+.avg-num{font-size:3.5rem;font-weight:900;color:var(--dk);line-height:1;}
+.avg-stars{color:var(--warn);font-size:1.3rem;margin:6px 0;}
+.avg-count{font-size:.78rem;color:var(--gr);font-weight:600;}
+.rating-bars{flex:1;}
+.rb-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer;}
+.rb-row:hover .rb-fill{filter:brightness(.9);}
+.rb-label{font-size:.78rem;font-weight:700;color:var(--gr);width:14px;text-align:right;}
+.rb-track{flex:1;height:10px;background:#f3f4f6;border-radius:99px;overflow:hidden;}
+.rb-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--warn),#fb923c);transition:width .7s;}
+.rb-count{font-size:.75rem;color:var(--gr);width:28px;}
+.rb-pct{font-size:.72rem;color:var(--gr);width:34px;text-align:right;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.ftab{
+  padding:6px 14px;border-radius:99px;border:1.5px solid #e5e7eb;
+  background:#fff;font-size:.8rem;font-weight:600;color:var(--gr);cursor:pointer;transition:all .2s;
+}
+.ftab.active,.ftab:hover{border-color:var(--p);background:var(--pl);color:var(--p);}
+.sort-sel{
+  padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:10px;
+  font-size:.82rem;color:var(--dk);outline:none;background:#fff;cursor:pointer;
+}
+.write-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 22px;
+  background:linear-gradient(135deg,var(--p),var(--ac));color:#fff;
+  border:none;border-radius:99px;font-size:.88rem;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 16px rgba(124,58,237,.3);transition:all .2s;white-space:nowrap;
+}
+.write-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.4);}
+
+/* ── REVIEW CARDS ── */
+.reviews-grid{display:flex;flex-direction:column;gap:16px;}
+.review-card{
+  background:var(--card);border-radius:18px;padding:22px 24px;
+  box-shadow:0 2px 12px rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.06);
+  transition:box-shadow .2s;
+}
+.review-card:hover{box-shadow:0 4px 20px rgba(124,58,237,.12);}
+.rc-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.rc-avatar{
+  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;font-weight:800;color:#fff;flex-shrink:0;
+}
+.rc-meta{flex:1;}
+.rc-name{font-size:.9rem;font-weight:700;color:var(--dk);}
+.rc-date{font-size:.73rem;color:var(--gr);margin-top:2px;}
+.rc-stars{color:var(--warn);font-size:.9rem;margin-top:3px;}
+.rc-badge{
+  display:inline-flex;align-items:center;gap:4px;background:var(--pl);
+  color:var(--p);font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:99px;margin-left:6px;
+}
+.verified-badge{background:#d1fae5;color:#065f46;}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.rc-tag{
+  padding:3px 10px;border-radius:99px;background:#f3f4f6;
+  color:#374151;font-size:.72rem;font-weight:600;
+}
+.rc-title{font-size:.95rem;font-weight:700;color:var(--dk);margin-bottom:6px;}
+.rc-body{font-size:.85rem;color:#374151;line-height:1.7;margin-bottom:12px;}
+.rc-photos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.rc-photo{
+  width:80px;height:80px;border-radius:10px;object-fit:cover;cursor:pointer;
+  border:2px solid #f3f4f6;transition:transform .2s;
+}
+.rc-photo:hover{transform:scale(1.05);border-color:var(--p);}
+.rc-footer{display:flex;align-items:center;gap:12px;border-top:1px solid #f3f4f6;padding-top:10px;}
+.rc-helpful{
+  display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--gr);
+  cursor:pointer;padding:5px 12px;border-radius:8px;border:1px solid #e5e7eb;
+  background:#fff;transition:all .2s;font-weight:600;
+}
+.rc-helpful:hover,.rc-helpful.liked{background:var(--pl);border-color:var(--p);color:var(--p);}
+.rc-helpful.liked i{color:var(--p);}
+.rc-product{font-size:.75rem;color:var(--gr);margin-left:auto;display:flex;align-items:center;gap:4px;}
+.owner-reply{
+  background:#fafafa;border-left:3px solid var(--p);border-radius:0 10px 10px 0;
+  padding:12px 14px;margin-top:12px;
+}
+.or-label{font-size:.75rem;font-weight:700;color:var(--p);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.or-text{font-size:.82rem;color:#374151;line-height:1.6;}
+
+/* ── WRITE REVIEW MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(30,27,75,.5);
+  z-index:999;align-items:center;justify-content:center;padding:16px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:#fff;border-radius:24px;width:100%;max-width:580px;
+  max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+.modal-head{
+  padding:20px 24px;border-bottom:1px solid #f3f4f6;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;background:#fff;z-index:1;border-radius:24px 24px 0 0;
+}
+.modal-head h3{font-size:1.1rem;font-weight:700;color:var(--p);display:flex;align-items:center;gap:8px;}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;border:none;background:#f3f4f6;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gr);font-size:1rem;
+}
+.modal-close:hover{background:#e2e8f0;}
+.modal-body{padding:24px;}
+
+/* ── BIG STAR SELECTOR ── */
+.big-stars{display:flex;gap:8px;justify-content:center;margin:12px 0 4px;}
+.big-star{
+  font-size:2.8rem;cursor:pointer;color:#e5e7eb;transition:all .15s;
+  line-height:1;
+}
+.big-star.lit{color:var(--warn);}
+.big-star:hover{transform:scale(1.15);}
+.star-hint{text-align:center;font-size:.85rem;font-weight:600;color:var(--gr);min-height:22px;margin-bottom:14px;}
+
+/* ── ASPECT RATINGS ── */
+.aspect-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.aspect-item{background:#fafafa;border-radius:12px;padding:12px;}
+.aspect-label{font-size:.75rem;font-weight:700;color:var(--gr);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.aspect-stars{display:flex;gap:3px;}
+.aspect-star{font-size:1.2rem;cursor:pointer;color:#e5e7eb;transition:color .1s;}
+.aspect-star.lit{color:var(--warn);}
+
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:.83rem;font-weight:700;color:#374151;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.form-label i{color:var(--p);}
+input[type=text],input[type=email],select,textarea{
+  width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:10px;
+  font-size:.9rem;outline:none;background:#fafafa;color:var(--dk);transition:border .2s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,.1);}
+textarea{resize:vertical;min-height:100px;line-height:1.6;}
+
+/* ── PHOTO UPLOAD ── */
+.photo-upload-area{
+  border:2px dashed #d1d5db;border-radius:14px;padding:20px;text-align:center;
+  cursor:pointer;transition:all .2s;background:#fafafa;
+}
+.photo-upload-area:hover{border-color:var(--p);background:var(--pl);}
+.photo-upload-area i{font-size:1.8rem;color:var(--gr);display:block;margin-bottom:6px;}
+.photo-upload-area .pu-text{font-size:.83rem;font-weight:600;color:var(--gr);}
+.photo-upload-area .pu-sub{font-size:.72rem;color:#94a3b8;margin-top:2px;}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.pp-item{position:relative;width:72px;height:72px;}
+.pp-item img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid #e5e7eb;}
+.pp-remove{
+  position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:var(--red);
+  color:#fff;border-radius:50%;border:none;cursor:pointer;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── SUBMIT ── */
+.submit-btn{
+  width:100%;padding:14px;background:linear-gradient(135deg,var(--p),var(--ac));
+  color:#fff;border:none;border-radius:12px;font-size:.98rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 5px 18px rgba(124,58,237,.3);transition:all .2s;margin-top:4px;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.4);}
+
+/* ── EMPTY / LOAD ── */
+.empty-reviews{text-align:center;padding:60px 20px;color:var(--gr);}
+.empty-reviews i{font-size:3rem;opacity:.3;display:block;margin-bottom:14px;}
+
+/* ── IMAGE LIGHTBOX ── */
+.lightbox{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:9999;align-items:center;justify-content:center;
+}
+.lightbox.show{display:flex;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;}
+.lb-close{position:absolute;top:16px;right:20px;color:#fff;font-size:1.8rem;cursor:pointer;opacity:.8;}
+.lb-close:hover{opacity:1;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1e1b4b;color:#fff;padding:12px 24px;border-radius:99px;
+  font-size:.88rem;font-weight:600;transition:transform .3s;z-index:9000;
+  display:flex;align-items:center;gap:8px;box-shadow:0 6px 24px rgba(0,0,0,.2);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── NAV ── */
+.nav{
+  background:#fff;border-bottom:1px solid #ede9fe;
+  padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 1px 8px rgba(124,58,237,.07);
+}
+.nav-brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--dk);font-size:.95rem;text-decoration:none;}
+.nav-links{display:flex;gap:6px;}
+.nav-link{
+  padding:7px 14px;border-radius:8px;font-size:.8rem;font-weight:600;
+  color:var(--gr);text-decoration:none;transition:all .2s;
+}
+.nav-link:hover{background:var(--pl);color:var(--p);}
+.nav-link.active{background:var(--pl);color:var(--p);}
+
+@media(max-width:600px){
+  .summary-bar{grid-template-columns:1fr;}
+  .avg-score{border-right:none;border-bottom:1px solid #f3f4f6;padding-bottom:16px;}
+  .aspect-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="fashion-pos.html"><i class="fa-solid fa-bag-shopping" style="color:var(--p)"></i> ร้านแฟชั่นเสื้อผ้า</a>
+  <div class="nav-links">
+    <a class="nav-link" href="fashion-pos.html"><i class="fa-solid fa-cash-register"></i> POS</a>
+    <a class="nav-link active" href="review.html"><i class="fa-solid fa-star"></i> รีวิว</a>
+    <a class="nav-link" href="review-admin.html"><i class="fa-solid fa-shield-halved"></i> แอดมิน</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><i class="fa-solid fa-star"></i> รีวิวจากลูกค้าจริง</div>
+  <h1>ความคิดเห็นของลูกค้า</h1>
+  <p>ร่วมแบ่งปันประสบการณ์การซื้อสินค้า เพื่อช่วยให้ลูกค้าคนอื่นตัดสินใจได้ง่ายขึ้น</p>
+  <div class="hero-stats" id="heroStats">
+    <div class="hero-stat"><div class="num" id="hTotal">0</div><div class="lbl">รีวิวทั้งหมด</div></div>
+    <div class="hero-stat"><div class="num" id="hAvg">–</div><div class="lbl">คะแนนเฉลี่ย</div></div>
+    <div class="hero-stat"><div class="num" id="hRecommend">0%</div><div class="lbl">แนะนำสินค้านี้</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SUMMARY BAR -->
+  <div class="summary-bar" id="summaryBar" style="display:none">
+    <div class="avg-score">
+      <div class="avg-num" id="avgNum">0.0</div>
+      <div class="avg-stars" id="avgStars">☆☆☆☆☆</div>
+      <div class="avg-count" id="avgCount">0 รีวิว</div>
+    </div>
+    <div class="rating-bars" id="ratingBars"></div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="filter-tabs" id="filterTabs">
+      <div class="ftab active" onclick="setFilter(0,this)">⭐ ทั้งหมด</div>
+      <div class="ftab" onclick="setFilter(5,this)">5 ดาว</div>
+      <div class="ftab" onclick="setFilter(4,this)">4 ดาว</div>
+      <div class="ftab" onclick="setFilter(3,this)">3 ดาว</div>
+      <div class="ftab" onclick="setFilter(2,this)">2 ดาว</div>
+      <div class="ftab" onclick="setFilter(1,this)">1 ดาว</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select class="sort-sel" onchange="setSort(this.value)">
+        <option value="newest">ล่าสุดก่อน</option>
+        <option value="highest">คะแนนสูงสุด</option>
+        <option value="lowest">คะแนนต่ำสุด</option>
+        <option value="helpful">มีประโยชน์สูงสุด</option>
+      </select>
+      <button class="write-btn" onclick="openModal()"><i class="fa-solid fa-pen-to-square"></i> เขียนรีวิว</button>
+    </div>
+  </div>
+
+  <!-- REVIEWS LIST -->
+  <div class="reviews-grid" id="reviewsList"></div>
+  <div class="empty-reviews" id="emptyState">
+    <i class="fa-regular fa-star"></i>
+    <p style="font-size:1rem;font-weight:600;margin-bottom:6px;">ยังไม่มีรีวิว</p>
+    <p style="font-size:.85rem;">เป็นคนแรกที่แบ่งปันประสบการณ์!</p>
+    <button class="write-btn" style="margin:18px auto 0;display:inline-flex" onclick="openModal()"><i class="fa-solid fa-pen-to-square"></i> เขียนรีวิวแรก</button>
+  </div>
+
+</div>
+
+<!-- ── WRITE REVIEW MODAL ── -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-pen-to-square"></i> เขียนรีวิวของคุณ</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Overall stars -->
+      <div class="form-group" style="text-align:center">
+        <div class="form-label" style="justify-content:center"><i class="fa-solid fa-star"></i> คะแนนโดยรวม</div>
+        <div class="big-stars" id="bigStars">
+          <span class="big-star" data-v="1" onclick="setMainStar(1)">★</span>
+          <span class="big-star" data-v="2" onclick="setMainStar(2)">★</span>
+          <span class="big-star" data-v="3" onclick="setMainStar(3)">★</span>
+          <span class="big-star" data-v="4" onclick="setMainStar(4)">★</span>
+          <span class="big-star" data-v="5" onclick="setMainStar(5)">★</span>
+        </div>
+        <div class="star-hint" id="starHint">คลิกเพื่อให้คะแนน</div>
+      </div>
+
+      <!-- Aspect ratings -->
+      <div class="form-group">
+        <div class="form-label"><i class="fa-solid fa-sliders"></i> ให้คะแนนแต่ละด้าน</div>
+        <div class="aspect-grid">
+          <div class="aspect-item">
+            <div class="aspect-label"><i class="fa-solid fa-shirt" style="color:var(--p)"></i> คุณภาพสินค้า</div>
+            <div class="aspect-stars" data-aspect="quality"></div>
+          </div>
+          <div class="aspect-item">
+            <div class="aspect-label"><i class="fa-solid fa-tags" style="color:var(--ac)"></i> ความคุ้มค่าราคา</div>
+            <div class="aspect-stars" data-aspect="price"></div>
+          </div>
+          <div class="aspect-item">
+            <div class="aspect-label"><i class="fa-solid fa-ruler" style="color:var(--ok)"></i> ตรงตามไซส์</div>
+            <div class="aspect-stars" data-aspect="size"></div>
+          </div>
+          <div class="aspect-item">
+            <div class="aspect-label"><i class="fa-solid fa-truck" style="color:var(--warn)"></i> ความรวดเร็ว</div>
+            <div class="aspect-stars" data-aspect="delivery"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product -->
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-shirt"></i> สินค้าที่ซื้อ</label>
+        <select id="rvProduct">
+          <option value="">-- เลือกสินค้า --</option>
+          <option>เสื้อยืด Basic</option><option>เสื้อยืด Graphic</option>
+          <option>เสื้อเชิ้ต Oxford</option><option>กางเกงยีนส์ Slim</option>
+          <option>กางเกงขาสั้น Casual</option><option>กระโปรง Midi</option>
+          <option>แจ็คเก็ต Bomber</option><option>เดรสแขนสั้น Floral</option>
+          <option>เสื้อกันหนาว Knit</option><option>Hoodie Oversize</option>
+          <option>อื่นๆ</option>
+        </select>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <div class="form-label"><i class="fa-solid fa-tags"></i> แท็กที่เกี่ยวข้อง (เลือกได้หลายอย่าง)</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;" id="tagPills">
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="คุณภาพดี" style="display:none" onchange="toggleTag(this)"> คุณภาพดี</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="คุ้มค่า" style="display:none" onchange="toggleTag(this)"> คุ้มค่า</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="ตรงปก" style="display:none" onchange="toggleTag(this)"> ตรงปก</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="ส่งเร็ว" style="display:none" onchange="toggleTag(this)"> ส่งเร็ว</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="บรรจุภัณฑ์สวย" style="display:none" onchange="toggleTag(this)"> บรรจุภัณฑ์สวย</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="ผ้านุ่ม" style="display:none" onchange="toggleTag(this)"> ผ้านุ่ม</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="ไซส์พอดี" style="display:none" onchange="toggleTag(this)"> ไซส์พอดี</label>
+          <label class="ftab" style="cursor:pointer;user-select:none"><input type="checkbox" value="สีสวย" style="display:none" onchange="toggleTag(this)"> สีสวย</label>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-heading"></i> หัวข้อรีวิว</label>
+        <input type="text" id="rvTitle" placeholder="สรุปความรู้สึกของคุณในหนึ่งประโยค" maxlength="80"/>
+      </div>
+
+      <!-- Body -->
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-comment-dots"></i> รีวิวโดยละเอียด <span style="color:var(--red)">*</span></label>
+        <textarea id="rvBody" placeholder="เล่าประสบการณ์ของคุณ เช่น คุณภาพผ้า ทรงเสื้อ ความพอดีของไซส์ หรือบริการที่ได้รับ..." maxlength="800"></textarea>
+        <div style="text-align:right;font-size:.72rem;color:var(--gr);margin-top:3px"><span id="charCount">0</span>/800</div>
+      </div>
+
+      <!-- Name & Recommend -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label"><i class="fa-regular fa-user"></i> ชื่อผู้รีวิว</label>
+          <input type="text" id="rvName" placeholder="ชื่อของคุณ" maxlength="40"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-thumbs-up"></i> แนะนำสินค้านี้?</label>
+          <select id="rvRecommend">
+            <option value="yes">แนะนำ 👍</option>
+            <option value="no">ไม่แนะนำ 👎</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <div class="form-group">
+        <div class="form-label"><i class="fa-solid fa-images"></i> อัปโหลดรูปภาพ (ไม่เกิน 4 รูป)</div>
+        <label class="photo-upload-area" for="rvPhotos">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <div class="pu-text">คลิกหรือลากรูปมาวางที่นี่</div>
+          <div class="pu-sub">JPG, PNG · สูงสุด 4 รูป</div>
+        </label>
+        <input type="file" id="rvPhotos" accept="image/*" multiple style="display:none" onchange="previewPhotos(this)"/>
+        <div class="photo-previews" id="photoPreviews"></div>
+      </div>
+
+      <button class="submit-btn" onclick="submitReview()">
+        <i class="fa-solid fa-paper-plane"></i> ส่งรีวิว
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lb-close"><i class="fa-solid fa-xmark"></i></span>
+  <img id="lbImg" src="" alt=""/>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let reviews = [];
+let filterStar = 0;
+let sortMode = 'newest';
+const uploadedPhotos = [];
+const aspectRatings = { quality:0, price:0, size:0, delivery:0 };
+let mainStar = 0;
+
+const STAR_HINTS = ['','แย่มาก 😞','แย่ 😕','พอใช้ 😐','ดี 😊','ดีมาก 🤩'];
+const AVATAR_COLORS = ['#7c3aed','#ec4899','#10b981','#f59e0b','#ef4444','#0ea5e9','#8b5cf6'];
+
+// ── Demo reviews seed ──
+function seedDemoReviews(){
+  if(localStorage.getItem('shopReviews')) return;
+  const demos = [
+    { id:Date.now()-9e6, name:'คุณ พิมพ์ใจ', product:'เสื้อยืด Basic', star:5, title:'ดีมากเลยค่ะ คุ้มค่ามาก!', body:'ผ้านุ่มมาก สีไม่ตก ซักแล้วไม่หด ทรงสวยใส่สบาย จะมาซื้ออีกแน่นอนค่ะ บริการดีมากเลย ห่อของมาอย่างดี', tags:['คุณภาพดี','คุ้มค่า','ผ้านุ่ม','ไซส์พอดี'], recommend:'yes', helpful:12, aspects:{quality:5,price:5,size:4,delivery:5}, date:'22 พ.ค. 2569', verified:true, photos:[], reply:'ขอบคุณมากนะคะ ดีใจที่คุณพิมพ์ใจถูกใจสินค้าค่ะ รอพบกันใหม่ครั้งหน้า 💜' },
+    { id:Date.now()-7e6, name:'คุณ สมชาย', product:'กางเกงยีนส์ Slim', star:4, title:'ทรงดี แต่ไซส์เล็กกว่าที่คิด', body:'โดยรวมพอใจมากครับ ผ้ายีนส์หนาดีไม่บาง ทรงสวย สีเข้มสม่ำเสมอ แต่แนะนำสั่งเผื่อไซส์ขึ้นหน่อยนึง เพราะผมใส่ 32 ปกติ แต่ต้องสั่ง 34 ครับ', tags:['ตรงปก','คุณภาพดี','สีสวย'], recommend:'yes', helpful:8, aspects:{quality:4,price:4,size:3,delivery:4}, date:'20 พ.ค. 2569', verified:true, photos:[], reply:'' },
+    { id:Date.now()-5e6, name:'คุณ วาสนา', product:'กระโปรง Midi', star:5, title:'สวยมาก ใส่ทำงานได้เลย', body:'รีบสั่งเลยค่ะ กระโปรงสวยมาก เนื้อผ้าดี ไม่ยับง่าย ใส่ทำงานหรือออกไปเดินเล่นก็ได้ค่ะ ราคาคุ้มมากๆ เมื่อเทียบกับคุณภาพ ประทับใจบรรจุภัณฑ์ด้วย ห่อสวยมาก', tags:['คุณภาพดี','บรรจุภัณฑ์สวย','คุ้มค่า','สีสวย'], recommend:'yes', helpful:15, aspects:{quality:5,price:5,size:5,delivery:5}, date:'18 พ.ค. 2569', verified:false, photos:[], reply:'ขอบคุณค่ะคุณวาสนา ดีใจมากที่ถูกใจค่ะ 🌸' },
+    { id:Date.now()-3e6, name:'คุณ เอกชัย', product:'Hoodie Oversize', star:3, title:'ผ้าดีแต่สีต่างจากรูป', body:'โดยรวมโอเคครับ ผ้าหนาดี ทรงพอดีตามแบบ Oversize แต่สีที่ได้จริงอ่อนกว่าในรูปค่อนข้างเยอะ อาจเป็นเพราะแสงในรูปก็ได้ครับ บริการโอเคครับ', tags:['คุณภาพดี'], recommend:'yes', helpful:5, aspects:{quality:3,price:3,size:4,delivery:3}, date:'15 พ.ค. 2569', verified:true, photos:[], reply:'' },
+    { id:Date.now()-1e6, name:'คุณ มินตรา', product:'เดรสแขนสั้น Floral', star:5, title:'สวยมากค่ะ ปังมากเลย', body:'เดรสสวยมากค่ะ ลายดอกไม้น่ารักมาก ผ้าไม่ร้อน ใส่สบาย ซักได้ง่าย ใส่ไปงานแล้วได้รับคำชมเยอะมากค่ะ จะสั่งสีอื่นอีกแน่นอน', tags:['คุณภาพดี','ตรงปก','สีสวย','ผ้านุ่ม'], recommend:'yes', helpful:20, aspects:{quality:5,price:5,size:5,delivery:5}, date:'10 พ.ค. 2569', verified:true, photos:[], reply:'ขอบคุณมากเลยนะคะ ดีใจที่ดูดีในงาน 🌸💜' },
+  ];
+  localStorage.setItem('shopReviews', JSON.stringify(demos));
+}
+
+// ── Load ──
+function loadReviews(){
+  seedDemoReviews();
+  reviews = JSON.parse(localStorage.getItem('shopReviews')||'[]');
+  render();
+}
+
+// ── Render ──
+function render(){
+  // filter + sort
+  let list = [...reviews];
+  if(filterStar) list = list.filter(r=>r.star===filterStar);
+  if(sortMode==='newest') list.sort((a,b)=>b.id-a.id);
+  else if(sortMode==='highest') list.sort((a,b)=>b.star-a.star);
+  else if(sortMode==='lowest') list.sort((a,b)=>a.star-b.star);
+  else if(sortMode==='helpful') list.sort((a,b)=>b.helpful-a.helpful);
+
+  // hero stats
+  const total = reviews.length;
+  const avg = total ? reviews.reduce((s,r)=>s+r.star,0)/total : 0;
+  const rec = total ? Math.round(reviews.filter(r=>r.recommend==='yes').length/total*100) : 0;
+  document.getElementById('hTotal').textContent = total;
+  document.getElementById('hAvg').textContent = avg ? avg.toFixed(1)+'★' : '–';
+  document.getElementById('hRecommend').textContent = rec+'%';
+
+  // summary bar
+  if(total){
+    document.getElementById('summaryBar').style.display='grid';
+    document.getElementById('avgNum').textContent = avg.toFixed(1);
+    document.getElementById('avgStars').textContent = starStr(Math.round(avg));
+    document.getElementById('avgCount').textContent = total+' รีวิว';
+    const counts=[0,0,0,0,0];
+    reviews.forEach(r=>{ if(r.star>=1&&r.star<=5) counts[r.star-1]++; });
+    document.getElementById('ratingBars').innerHTML = [5,4,3,2,1].map(n=>`
+      <div class="rb-row" onclick="setFilter(${n},null)">
+        <div class="rb-label">${n}</div>
+        <div class="rb-track"><div class="rb-fill" style="width:${total?counts[n-1]/total*100:0}%"></div></div>
+        <div class="rb-count">${counts[n-1]}</div>
+        <div class="rb-pct">${total?Math.round(counts[n-1]/total*100):0}%</div>
+      </div>
+    `).join('');
+  }
+
+  // reviews
+  const el = document.getElementById('reviewsList');
+  const empty = document.getElementById('emptyState');
+  if(!list.length){
+    el.innerHTML=''; empty.style.display='block'; return;
+  }
+  empty.style.display='none';
+  el.innerHTML = list.map(r=>`
+    <div class="review-card" id="rv${r.id}">
+      <div class="rc-header">
+        <div class="rc-avatar" style="background:${AVATAR_COLORS[Math.abs(r.id)%AVATAR_COLORS.length]}">${r.name.charAt(2)||'?'}</div>
+        <div class="rc-meta">
+          <div class="rc-name">
+            ${r.name}
+            ${r.verified?`<span class="rc-badge verified-badge"><i class="fa-solid fa-circle-check"></i> ซื้อจริง</span>`:''}
+          </div>
+          <div class="rc-date"><i class="fa-regular fa-calendar"></i> ${r.date}</div>
+          <div class="rc-stars">${starStr(r.star)} <span style="font-size:.78rem;color:var(--gr);font-weight:700;margin-left:4px">${r.star}.0</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          ${r.recommend==='yes'?'<div style="font-size:.75rem;color:var(--ok);font-weight:600"><i class="fa-solid fa-thumbs-up"></i> แนะนำ</div>':'<div style="font-size:.75rem;color:var(--red);font-weight:600"><i class="fa-solid fa-thumbs-down"></i> ไม่แนะนำ</div>'}
+        </div>
+      </div>
+      ${r.tags&&r.tags.length?`<div class="rc-tags">${r.tags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>`:''}
+      ${r.title?`<div class="rc-title">${r.title}</div>`:''}
+      <div class="rc-body">${r.body}</div>
+      ${r.photos&&r.photos.length?`<div class="rc-photos">${r.photos.map(p=>`<img class="rc-photo" src="${p}" onclick="openLightbox('${p}')" alt="รีวิว"/>`).join('')}</div>`:''}
+      ${r.aspects?`
+      <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;margin-bottom:12px;background:#fafafa;border-radius:10px;padding:10px;">
+        <span><i class="fa-solid fa-shirt" style="color:var(--p)"></i> คุณภาพ: <b>${starStr(r.aspects.quality)}</b></span>
+        <span><i class="fa-solid fa-tags" style="color:var(--ac)"></i> ราคา: <b>${starStr(r.aspects.price)}</b></span>
+        <span><i class="fa-solid fa-ruler" style="color:var(--ok)"></i> ไซส์: <b>${starStr(r.aspects.size)}</b></span>
+        <span><i class="fa-solid fa-truck" style="color:var(--warn)"></i> รวดเร็ว: <b>${starStr(r.aspects.delivery)}</b></span>
+      </div>`:''}
+      <div class="rc-footer">
+        <button class="rc-helpful ${r._liked?'liked':''}" onclick="toggleHelpful(${r.id})">
+          <i class="fa-${r._liked?'solid':'regular'} fa-thumbs-up"></i> มีประโยชน์ (${r.helpful})
+        </button>
+        <div class="rc-product"><i class="fa-solid fa-shirt"></i> ${r.product||'สินค้า'}</div>
+      </div>
+      ${r.reply?`<div class="owner-reply"><div class="or-label"><i class="fa-solid fa-store"></i> ร้านตอบกลับ</div><div class="or-text">${r.reply}</div></div>`:''}
+    </div>
+  `).join('');
+}
+
+function starStr(n){ return '★'.repeat(Math.max(0,Math.min(5,n)))+'☆'.repeat(5-Math.max(0,Math.min(5,n))); }
+function setFilter(n, el){
+  filterStar=n;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('.ftab')[0].classList.add('active');
+  render();
+}
+function setSort(v){ sortMode=v; render(); }
+
+// ── Helpful ──
+function toggleHelpful(id){
+  const r = reviews.find(x=>x.id===id);
+  if(!r) return;
+  r._liked = !r._liked;
+  r.helpful += r._liked ? 1 : -1;
+  localStorage.setItem('shopReviews', JSON.stringify(reviews));
+  render();
+}
+
+// ── Lightbox ──
+function openLightbox(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('show'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('show'); }
+
+// ── Toast ──
+function showToast(msg,icon='fa-check-circle'){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── Modal ──
+function openModal(){ document.getElementById('reviewModal').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeModal(){ document.getElementById('reviewModal').classList.remove('show'); document.body.style.overflow=''; }
+
+// ── Main star ──
+function setMainStar(v){
+  mainStar=v;
+  document.querySelectorAll('.big-star').forEach(s=>{ s.classList.toggle('lit',+s.dataset.v<=v); });
+  document.getElementById('starHint').textContent = STAR_HINTS[v]||'';
+}
+document.querySelectorAll('.big-star').forEach(s=>{
+  s.addEventListener('mouseover',()=>{ document.querySelectorAll('.big-star').forEach(x=>x.classList.toggle('lit',+x.dataset.v<=+s.dataset.v)); });
+  s.addEventListener('mouseleave',()=>{ document.querySelectorAll('.big-star').forEach(x=>x.classList.toggle('lit',+x.dataset.v<=mainStar)); });
+});
+
+// ── Aspect stars ──
+document.querySelectorAll('.aspect-stars').forEach(wrap=>{
+  const aspect = wrap.dataset.aspect;
+  for(let i=1;i<=5;i++){
+    const s = document.createElement('span');
+    s.className='aspect-star'; s.textContent='★'; s.dataset.v=i;
+    s.onclick=()=>{ aspectRatings[aspect]=i; wrap.querySelectorAll('.aspect-star').forEach(x=>x.classList.toggle('lit',+x.dataset.v<=i)); };
+    s.onmouseover=()=>wrap.querySelectorAll('.aspect-star').forEach(x=>x.classList.toggle('lit',+x.dataset.v<=i));
+    s.onmouseleave=()=>wrap.querySelectorAll('.aspect-star').forEach(x=>x.classList.toggle('lit',+x.dataset.v<=aspectRatings[aspect]));
+    wrap.appendChild(s);
+  }
+});
+
+// ── Tags ──
+function toggleTag(cb){ cb.closest('label').classList.toggle('active',cb.checked); }
+
+// ── Photos ──
+function previewPhotos(input){
+  const files = Array.from(input.files).slice(0,4);
+  uploadedPhotos.length=0;
+  const wrap = document.getElementById('photoPreviews');
+  wrap.innerHTML='';
+  files.forEach((f,i)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      uploadedPhotos[i]=e.target.result;
+      const div=document.createElement('div'); div.className='pp-item';
+      div.innerHTML=`<img src="${e.target.result}" alt=""/><button class="pp-remove" onclick="removePhoto(${i})"><i class="fa-solid fa-xmark"></i></button>`;
+      wrap.appendChild(div);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function removePhoto(i){ uploadedPhotos.splice(i,1); document.getElementById('rvPhotos').value=''; previewPhotos({files:[]}); }
+
+// ── Char count ──
+document.getElementById('rvBody').addEventListener('input',function(){ document.getElementById('charCount').textContent=this.value.length; });
+
+// ── Submit ──
+function submitReview(){
+  if(!mainStar){ showToast('กรุณาให้คะแนนโดยรวมก่อน','fa-triangle-exclamation'); return; }
+  const body = document.getElementById('rvBody').value.trim();
+  if(!body){ showToast('กรุณาเขียนรีวิวของคุณ','fa-triangle-exclamation'); return; }
+  const tags = [...document.querySelectorAll('#tagPills input:checked')].map(c=>c.value);
+  const r = {
+    id: Date.now(),
+    name: document.getElementById('rvName').value.trim() || 'ลูกค้าไม่ระบุชื่อ',
+    product: document.getElementById('rvProduct').value || 'สินค้า',
+    star: mainStar,
+    title: document.getElementById('rvTitle').value.trim(),
+    body,
+    tags,
+    recommend: document.getElementById('rvRecommend').value,
+    helpful: 0,
+    aspects: {...aspectRatings},
+    date: new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'}),
+    verified: false,
+    photos: [...uploadedPhotos],
+    reply: '',
+    _liked: false
+  };
+  reviews.unshift(r);
+  localStorage.setItem('shopReviews', JSON.stringify(reviews));
+  closeModal();
+  showToast('ส่งรีวิวสำเร็จ! ขอบคุณที่แบ่งปัน 💜','fa-check-circle');
+  // reset form
+  mainStar=0; Object.keys(aspectRatings).forEach(k=>aspectRatings[k]=0);
+  document.getElementById('rvBody').value='';
+  document.getElementById('rvTitle').value='';
+  document.getElementById('rvName').value='';
+  document.getElementById('rvProduct').value='';
+  document.getElementById('charCount').textContent='0';
+  document.getElementById('photoPreviews').innerHTML='';
+  uploadedPhotos.length=0;
+  document.querySelectorAll('.big-star').forEach(s=>s.classList.remove('lit'));
+  document.getElementById('starHint').textContent='คลิกเพื่อให้คะแนน';
+  document.querySelectorAll('.aspect-star').forEach(s=>s.classList.remove('lit'));
+  document.querySelectorAll('#tagPills input').forEach(c=>{ c.checked=false; c.closest('label').classList.remove('active'); });
+  setFilter(0, document.querySelector('.ftab'));
+  render();
+}
+
+loadReviews();
+</script>
+</body>
+</html>

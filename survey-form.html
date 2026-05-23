@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบสอบถามความพึงพอใจ – ร้านแฟชั่นเสื้อผ้า</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #ede9fe;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --dark: #1e1b4b;
+      --gray: #64748b;
+      --bg: #f5f3ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      color: #fff; padding: 48px 24px 80px; text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-icon { font-size: 3.5rem; margin-bottom: 14px; display: block; }
+    .hero h1 { font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; letter-spacing: .5px; }
+    .hero p { font-size: 1rem; opacity: .88; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.35); border-radius: 20px;
+      padding: 5px 14px; font-size: .8rem; margin-top: 14px;
+    }
+
+    /* ── CARD WRAPPER ── */
+    .form-wrap { max-width: 660px; margin: -44px auto 40px; padding: 0 16px; }
+
+    /* ── PROGRESS ── */
+    .progress-bar {
+      background: #fff; border-radius: 16px; padding: 18px 22px; margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(124,58,237,.1);
+    }
+    .progress-label { display: flex; justify-content: space-between; font-size: .82rem; color: var(--gray); margin-bottom: 8px; }
+    .progress-track { height: 8px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#7c3aed,#ec4899); transition: width .4s; }
+
+    /* ── SECTION CARD ── */
+    .card {
+      background: #fff; border-radius: 20px; padding: 28px 26px; margin-bottom: 18px;
+      box-shadow: 0 2px 16px rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.08);
+    }
+    .section-title {
+      display: flex; align-items: center; gap: 10px; font-size: 1.05rem;
+      font-weight: 700; color: var(--primary); margin-bottom: 22px;
+    }
+    .section-title .icon-wrap {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--primary-light); display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--primary); flex-shrink: 0;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: .88rem; font-weight: 600; color: #374151; margin-bottom: 7px; }
+    label .req { color: var(--accent); margin-left: 2px; }
+    input[type=text], input[type=email], input[type=tel], select, textarea {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      font-size: .93rem; outline: none; color: var(--dark); transition: border .2s, box-shadow .2s;
+      background: #fafafa;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary); background: #fff;
+      box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    .input-icon { position: relative; }
+    .input-icon i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: .9rem; }
+    .input-icon input { padding-left: 38px; }
+
+    /* ── STAR RATING ── */
+    .star-group { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; margin-top: 4px; }
+    .star-group input { display: none; }
+    .star-group label {
+      font-size: 2rem; color: #d1d5db; cursor: pointer; transition: color .15s, transform .15s;
+      margin-bottom: 0; font-weight: normal;
+    }
+    .star-group label:hover,
+    .star-group label:hover ~ label,
+    .star-group input:checked ~ label { color: #f59e0b; }
+    .star-group label:hover { transform: scale(1.15); }
+    .star-labels { display: flex; justify-content: space-between; font-size: .72rem; color: var(--gray); margin-top: 4px; }
+
+    /* ── EMOJI RATING ── */
+    .emoji-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .emoji-option input { display: none; }
+    .emoji-option label {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 14px;
+      cursor: pointer; transition: all .2s; font-size: .75rem; color: var(--gray);
+      min-width: 68px; text-align: center; font-weight: 600; margin-bottom: 0;
+    }
+    .emoji-option label .em { font-size: 1.8rem; display: block; }
+    .emoji-option input:checked + label { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .emoji-option label:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,.15); }
+
+    /* ── CHECKBOX / RADIO PILLS ── */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .pill input { display: none; }
+    .pill label {
+      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+      border: 1.5px solid #e5e7eb; border-radius: 99px; cursor: pointer;
+      font-size: .83rem; font-weight: 600; color: #374151; transition: all .2s; margin-bottom: 0;
+    }
+    .pill label i { font-size: .85rem; color: var(--gray); }
+    .pill input:checked + label { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .pill input:checked + label i { color: var(--primary); }
+    .pill label:hover { border-color: var(--primary); }
+
+    /* ── SLIDER ── */
+    .slider-wrap { margin-top: 8px; }
+    input[type=range] {
+      width: 100%; accent-color: var(--primary); height: 6px; cursor: pointer;
+    }
+    .slider-val { display: flex; justify-content: space-between; font-size: .78rem; color: var(--gray); margin-top: 4px; }
+    .slider-current { text-align: center; font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-top: 6px; }
+
+    /* ── NET PROMOTER ── */
+    .nps-group { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+    .nps-btn { flex: 1; min-width: 36px; padding: 10px 4px; border: 1.5px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 700; font-size: .88rem; transition: all .2s; color: #374151; background: #fff; }
+    .nps-btn:hover { border-color: var(--primary); }
+    .nps-btn.sel { color: #fff; border-color: transparent; }
+    .nps-btn.red.sel { background: #ef4444; }
+    .nps-btn.yellow.sel { background: var(--warn); }
+    .nps-btn.green.sel { background: var(--success); }
+    .nps-label { display: flex; justify-content: space-between; font-size: .73rem; color: var(--gray); margin-top: 6px; }
+
+    /* ── SUBMIT BTN ── */
+    .submit-wrap { text-align: center; margin-top: 10px; }
+    .submit-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 48px; background: linear-gradient(135deg,#7c3aed,#ec4899);
+      color: #fff; border: none; border-radius: 99px; font-size: 1.05rem;
+      font-weight: 700; cursor: pointer; box-shadow: 0 6px 24px rgba(124,58,237,.35);
+      transition: transform .2s, box-shadow .2s; letter-spacing: .5px;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(124,58,237,.45); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* ── SUCCESS ── */
+    .success-screen {
+      display: none; text-align: center; padding: 60px 24px;
+    }
+    .success-screen .big-icon { font-size: 5rem; margin-bottom: 20px; animation: pop .5s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-screen h2 { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+    .success-screen p { color: var(--gray); font-size: .95rem; line-height: 1.6; max-width: 360px; margin: 0 auto 28px; }
+    .back-link { display: inline-flex; align-items: center; gap: 7px; color: var(--primary); font-weight: 600; text-decoration: none; font-size: .9rem; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-icon">👗</span>
+  <h1>แบบสอบถามความพึงพอใจ</h1>
+  <p>ความคิดเห็นของคุณมีค่ามากสำหรับเรา ช่วยให้เราพัฒนาสินค้าและบริการให้ดียิ่งขึ้น</p>
+  <div class="hero-badge"><i class="fa-regular fa-clock"></i> ใช้เวลาเพียง 3-5 นาที</div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="progress-label">
+      <span><i class="fa-solid fa-list-check"></i> &nbsp;ความคืบหน้า</span>
+      <span id="progressText">0 / 5 ส่วน</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <form id="surveyForm">
+
+    <!-- ── ส่วนที่ 1: ข้อมูลผู้ตอบ ── -->
+    <div class="card" data-section="1">
+      <div class="section-title">
+        <div class="icon-wrap"><i class="fa-solid fa-user"></i></div>
+        ข้อมูลผู้ตอบแบบสอบถาม
+      </div>
+
+      <div class="form-group">
+        <label>ชื่อ-นามสกุล</label>
+        <div class="input-icon">
+          <i class="fa-regular fa-user"></i>
+          <input type="text" name="name" placeholder="ชื่อของคุณ (ไม่บังคับ)" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>อีเมล</label>
+        <div class="input-icon">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" name="email" placeholder="example@email.com (ไม่บังคับ)" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>เพศ</label>
+        <div class="pill-group">
+          <div class="pill"><input type="radio" name="gender" id="g1" value="ชาย"/><label for="g1"><i class="fa-solid fa-mars"></i>ชาย</label></div>
+          <div class="pill"><input type="radio" name="gender" id="g2" value="หญิง"/><label for="g2"><i class="fa-solid fa-venus"></i>หญิง</label></div>
+          <div class="pill"><input type="radio" name="gender" id="g3" value="LGBTQ+"/><label for="g3"><i class="fa-solid fa-rainbow"></i>LGBTQ+</label></div>
+          <div class="pill"><input type="radio" name="gender" id="g4" value="ไม่ระบุ"/><label for="g4"><i class="fa-solid fa-circle-minus"></i>ไม่ระบุ</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ช่วงอายุ</label>
+        <div class="pill-group">
+          <div class="pill"><input type="radio" name="age" id="a1" value="น้อยกว่า 18 ปี"/><label for="a1"><i class="fa-solid fa-child"></i>น้อยกว่า 18 ปี</label></div>
+          <div class="pill"><input type="radio" name="age" id="a2" value="18-25 ปี"/><label for="a2">18–25 ปี</label></div>
+          <div class="pill"><input type="radio" name="age" id="a3" value="26-35 ปี"/><label for="a3">26–35 ปี</label></div>
+          <div class="pill"><input type="radio" name="age" id="a4" value="36-45 ปี"/><label for="a4">36–45 ปี</label></div>
+          <div class="pill"><input type="radio" name="age" id="a5" value="มากกว่า 45 ปี"/><label for="a5">มากกว่า 45 ปี</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ส่วนที่ 2: ความถี่และช่องทาง ── -->
+    <div class="card" data-section="2">
+      <div class="section-title">
+        <div class="icon-wrap"><i class="fa-solid fa-store"></i></div>
+        พฤติกรรมการซื้อสินค้า
+      </div>
+
+      <div class="form-group">
+        <label>คุณมาซื้อสินค้าที่ร้านบ่อยแค่ไหน?<span class="req">*</span></label>
+        <div class="emoji-group">
+          <div class="emoji-option"><input type="radio" name="freq" id="f1" value="ครั้งแรก" required /><label for="f1"><span class="em">🆕</span>ครั้งแรก</label></div>
+          <div class="emoji-option"><input type="radio" name="freq" id="f2" value="นาน ๆ ครั้ง" /><label for="f2"><span class="em">🌙</span>นาน ๆ ครั้ง</label></div>
+          <div class="emoji-option"><input type="radio" name="freq" id="f3" value="รายเดือน" /><label for="f3"><span class="em">📅</span>รายเดือน</label></div>
+          <div class="emoji-option"><input type="radio" name="freq" id="f4" value="รายสัปดาห์" /><label for="f4"><span class="em">🔄</span>รายสัปดาห์</label></div>
+          <div class="emoji-option"><input type="radio" name="freq" id="f5" value="เกือบทุกวัน" /><label for="f5"><span class="em">⭐</span>เกือบทุกวัน</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>รู้จักร้านของเราจากช่องทางไหน? (เลือกได้หลายช่องทาง)</label>
+        <div class="pill-group">
+          <div class="pill"><input type="checkbox" name="channel" id="ch1" value="Facebook"/><label for="ch1"><i class="fa-brands fa-facebook"></i>Facebook</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch2" value="Instagram"/><label for="ch2"><i class="fa-brands fa-instagram"></i>Instagram</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch3" value="TikTok"/><label for="ch3"><i class="fa-brands fa-tiktok"></i>TikTok</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch4" value="เพื่อนแนะนำ"/><label for="ch4"><i class="fa-solid fa-user-group"></i>เพื่อนแนะนำ</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch5" value="ป้ายโฆษณา"/><label for="ch5"><i class="fa-solid fa-signs-post"></i>ป้ายโฆษณา</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch6" value="Google"/><label for="ch6"><i class="fa-brands fa-google"></i>Google</label></div>
+          <div class="pill"><input type="checkbox" name="channel" id="ch7" value="เดินผ่าน"/><label for="ch7"><i class="fa-solid fa-person-walking"></i>เดินผ่าน</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ยอดใช้จ่ายเฉลี่ยต่อครั้ง</label>
+        <div class="pill-group">
+          <div class="pill"><input type="radio" name="spend" id="s1" value="น้อยกว่า ฿500"/><label for="s1">น้อยกว่า ฿500</label></div>
+          <div class="pill"><input type="radio" name="spend" id="s2" value="฿500-1,000"/><label for="s2">฿500–1,000</label></div>
+          <div class="pill"><input type="radio" name="spend" id="s3" value="฿1,001-3,000"/><label for="s3">฿1,001–3,000</label></div>
+          <div class="pill"><input type="radio" name="spend" id="s4" value="มากกว่า ฿3,000"/><label for="s4">มากกว่า ฿3,000</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ส่วนที่ 3: ความพึงพอใจ ── -->
+    <div class="card" data-section="3">
+      <div class="section-title">
+        <div class="icon-wrap"><i class="fa-solid fa-star"></i></div>
+        ความพึงพอใจในด้านต่าง ๆ
+      </div>
+
+      <!-- Star ratings -->
+      <div class="form-group">
+        <label><i class="fa-solid fa-shirt" style="color:var(--primary)"></i> &nbsp;คุณภาพสินค้า<span class="req">*</span></label>
+        <div class="star-group">
+          <input type="radio" name="r_quality" id="q5" value="5" required /><label for="q5"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_quality" id="q4" value="4" /><label for="q4"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_quality" id="q3" value="3" /><label for="q3"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_quality" id="q2" value="2" /><label for="q2"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_quality" id="q1" value="1" /><label for="q1"><i class="fa-solid fa-star"></i></label>
+        </div>
+        <div class="star-labels"><span>แย่มาก</span><span>ดีมาก</span></div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-tags" style="color:var(--accent)"></i> &nbsp;ความคุ้มค่าราคา<span class="req">*</span></label>
+        <div class="star-group">
+          <input type="radio" name="r_price" id="p5" value="5" required /><label for="p5"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_price" id="p4" value="4" /><label for="p4"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_price" id="p3" value="3" /><label for="p3"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_price" id="p2" value="2" /><label for="p2"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_price" id="p1" value="1" /><label for="p1"><i class="fa-solid fa-star"></i></label>
+        </div>
+        <div class="star-labels"><span>แย่มาก</span><span>ดีมาก</span></div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-headset" style="color:var(--success)"></i> &nbsp;การบริการลูกค้า<span class="req">*</span></label>
+        <div class="star-group">
+          <input type="radio" name="r_service" id="sv5" value="5" required /><label for="sv5"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_service" id="sv4" value="4" /><label for="sv4"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_service" id="sv3" value="3" /><label for="sv3"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_service" id="sv2" value="2" /><label for="sv2"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_service" id="sv1" value="1" /><label for="sv1"><i class="fa-solid fa-star"></i></label>
+        </div>
+        <div class="star-labels"><span>แย่มาก</span><span>ดีมาก</span></div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-store" style="color:var(--warn)"></i> &nbsp;ความสะอาดและบรรยากาศร้าน<span class="req">*</span></label>
+        <div class="star-group">
+          <input type="radio" name="r_store" id="st5" value="5" required /><label for="st5"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_store" id="st4" value="4" /><label for="st4"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_store" id="st3" value="3" /><label for="st3"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_store" id="st2" value="2" /><label for="st2"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_store" id="st1" value="1" /><label for="st1"><i class="fa-solid fa-star"></i></label>
+        </div>
+        <div class="star-labels"><span>แย่มาก</span><span>ดีมาก</span></div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-layer-group" style="color:#8b5cf6"></i> &nbsp;ความหลากหลายของสินค้า<span class="req">*</span></label>
+        <div class="star-group">
+          <input type="radio" name="r_variety" id="v5" value="5" required /><label for="v5"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_variety" id="v4" value="4" /><label for="v4"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_variety" id="v3" value="3" /><label for="v3"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_variety" id="v2" value="2" /><label for="v2"><i class="fa-solid fa-star"></i></label>
+          <input type="radio" name="r_variety" id="v1" value="1" /><label for="v1"><i class="fa-solid fa-star"></i></label>
+        </div>
+        <div class="star-labels"><span>แย่มาก</span><span>ดีมาก</span></div>
+      </div>
+    </div>
+
+    <!-- ── ส่วนที่ 4: ความประทับใจโดยรวม ── -->
+    <div class="card" data-section="4">
+      <div class="section-title">
+        <div class="icon-wrap"><i class="fa-solid fa-face-smile"></i></div>
+        ความประทับใจโดยรวม
+      </div>
+
+      <div class="form-group">
+        <label>ความพึงพอใจโดยรวม<span class="req">*</span></label>
+        <div class="emoji-group">
+          <div class="emoji-option"><input type="radio" name="overall" id="ov1" value="1" required /><label for="ov1"><span class="em">😞</span>แย่มาก</label></div>
+          <div class="emoji-option"><input type="radio" name="overall" id="ov2" value="2" /><label for="ov2"><span class="em">😕</span>แย่</label></div>
+          <div class="emoji-option"><input type="radio" name="overall" id="ov3" value="3" /><label for="ov3"><span class="em">😐</span>พอใช้</label></div>
+          <div class="emoji-option"><input type="radio" name="overall" id="ov4" value="4" /><label for="ov4"><span class="em">😊</span>ดี</label></div>
+          <div class="emoji-option"><input type="radio" name="overall" id="ov5" value="5" /><label for="ov5"><span class="em">🤩</span>ดีมาก</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>คะแนนโอกาสแนะนำเพื่อน (0 = ไม่แนะนำเลย, 10 = แนะนำแน่นอน)<span class="req">*</span></label>
+        <div class="nps-group" id="npsGroup"></div>
+        <div class="nps-label">
+          <span>😣 ไม่แนะนำเลย</span>
+          <span>😍 แนะนำแน่นอน</span>
+        </div>
+        <input type="hidden" name="nps" id="npsValue" />
+      </div>
+
+      <div class="form-group">
+        <label>สิ่งที่ประทับใจมากที่สุด (เลือกได้หลายข้อ)</label>
+        <div class="pill-group">
+          <div class="pill"><input type="checkbox" name="best" id="b1" value="คุณภาพสินค้า"/><label for="b1"><i class="fa-solid fa-gem"></i>คุณภาพสินค้า</label></div>
+          <div class="pill"><input type="checkbox" name="best" id="b2" value="ราคาสมเหตุสมผล"/><label for="b2"><i class="fa-solid fa-sack-dollar"></i>ราคาสมเหตุสมผล</label></div>
+          <div class="pill"><input type="checkbox" name="best" id="b3" value="พนักงานใจดี"/><label for="b3"><i class="fa-solid fa-hands-holding-heart"></i>พนักงานใจดี</label></div>
+          <div class="pill"><input type="checkbox" name="best" id="b4" value="สินค้าหลากหลาย"/><label for="b4"><i class="fa-solid fa-layer-group"></i>สินค้าหลากหลาย</label></div>
+          <div class="pill"><input type="checkbox" name="best" id="b5" value="บรรยากาศร้านดี"/><label for="b5"><i class="fa-solid fa-wand-magic-sparkles"></i>บรรยากาศดี</label></div>
+          <div class="pill"><input type="checkbox" name="best" id="b6" value="โปรโมชั่นดี"/><label for="b6"><i class="fa-solid fa-percent"></i>โปรโมชั่นดี</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ส่วนที่ 5: ข้อเสนอแนะ ── -->
+    <div class="card" data-section="5">
+      <div class="section-title">
+        <div class="icon-wrap"><i class="fa-solid fa-comment-dots"></i></div>
+        ข้อเสนอแนะและความคิดเห็น
+      </div>
+
+      <div class="form-group">
+        <label>สิ่งที่ต้องการให้ปรับปรุง</label>
+        <div class="pill-group">
+          <div class="pill"><input type="checkbox" name="improve" id="im1" value="เพิ่มสินค้าใหม่"/><label for="im1"><i class="fa-solid fa-plus"></i>เพิ่มสินค้าใหม่</label></div>
+          <div class="pill"><input type="checkbox" name="improve" id="im2" value="ลดราคาลง"/><label for="im2"><i class="fa-solid fa-arrow-down"></i>ลดราคาลง</label></div>
+          <div class="pill"><input type="checkbox" name="improve" id="im3" value="เพิ่มไซส์ให้หลากหลาย"/><label for="im3"><i class="fa-solid fa-ruler"></i>เพิ่มไซส์</label></div>
+          <div class="pill"><input type="checkbox" name="improve" id="im4" value="ปรับปรุงห้องลอง"/><label for="im4"><i class="fa-solid fa-door-open"></i>ห้องลอง</label></div>
+          <div class="pill"><input type="checkbox" name="improve" id="im5" value="ที่จอดรถ"/><label for="im5"><i class="fa-solid fa-car"></i>ที่จอดรถ</label></div>
+          <div class="pill"><input type="checkbox" name="improve" id="im6" value="เปิดออนไลน์"/><label for="im6"><i class="fa-solid fa-globe"></i>เปิดออนไลน์</label></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-pen-to-square" style="color:var(--primary)"></i> &nbsp;ข้อเสนอแนะเพิ่มเติม</label>
+        <textarea name="comment" placeholder="บอกเราได้เลยว่าเราควรพัฒนาอะไรอีก หรือสิ่งที่คุณชื่นชอบ..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-star-half-stroke" style="color:var(--warn)"></i> &nbsp;โปรดประเมินประสบการณ์การกรอกแบบสอบถามนี้</label>
+        <div class="slider-wrap">
+          <input type="range" name="ux" min="1" max="10" value="7" oninput="updateSlider(this)" />
+          <div class="slider-val"><span>1 – ยากมาก</span><span>10 – ง่ายมาก</span></div>
+          <div class="slider-current" id="sliderVal">7</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" class="submit-btn">
+        <i class="fa-solid fa-paper-plane"></i>
+        ส่งแบบสอบถาม
+      </button>
+    </div>
+
+  </form>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="big-icon">🎉</div>
+    <h2>ขอบคุณมากครับ!</h2>
+    <p>เราได้รับแบบสอบถามของคุณแล้ว ความคิดเห็นของคุณจะช่วยให้เราพัฒนาร้านให้ดียิ่งขึ้น</p>
+    <a href="survey-admin.html" class="back-link">
+      <i class="fa-solid fa-chart-bar"></i> ดูรายงานผลแบบสอบถาม
+    </a>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<script>
+// ── NPS buttons ──
+const npsGroup = document.getElementById('npsGroup');
+for (let i = 0; i <= 10; i++) {
+  const cls = i <= 6 ? 'red' : i <= 8 ? 'yellow' : 'green';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = `nps-btn ${cls}`;
+  btn.textContent = i;
+  btn.onclick = () => {
+    document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    document.getElementById('npsValue').value = i;
+  };
+  npsGroup.appendChild(btn);
+}
+
+// ── Slider ──
+function updateSlider(el) {
+  document.getElementById('sliderVal').textContent = el.value;
+}
+
+// ── Progress ──
+function updateProgress() {
+  const sections = document.querySelectorAll('[data-section]');
+  let filled = 0;
+  sections.forEach(sec => {
+    const required = sec.querySelectorAll('[required]');
+    const allFilled = [...required].every(el => {
+      if (el.type === 'radio') return sec.querySelector(`[name="${el.name}"]:checked`);
+      return el.value.trim() !== '';
+    });
+    if (required.length === 0 || allFilled) filled++;
+  });
+  const pct = Math.round(filled / sections.length * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${filled} / ${sections.length} ส่วน`;
+}
+document.getElementById('surveyForm').addEventListener('change', updateProgress);
+document.getElementById('surveyForm').addEventListener('input', updateProgress);
+
+// ── Submit ──
+document.getElementById('surveyForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = {
+    id: Date.now(),
+    submittedAt: new Date().toLocaleString('th-TH'),
+    name: fd.get('name') || 'ไม่ระบุชื่อ',
+    email: fd.get('email') || '',
+    gender: fd.get('gender') || 'ไม่ระบุ',
+    age: fd.get('age') || 'ไม่ระบุ',
+    freq: fd.get('freq') || '',
+    channels: fd.getAll('channel'),
+    spend: fd.get('spend') || 'ไม่ระบุ',
+    ratings: {
+      quality: +fd.get('r_quality') || 0,
+      price: +fd.get('r_price') || 0,
+      service: +fd.get('r_service') || 0,
+      store: +fd.get('r_store') || 0,
+      variety: +fd.get('r_variety') || 0,
+    },
+    overall: +fd.get('overall') || 0,
+    nps: fd.get('nps') !== null ? +fd.get('nps') : null,
+    bestThings: fd.getAll('best'),
+    improvements: fd.getAll('improve'),
+    comment: fd.get('comment') || '',
+    ux: +fd.get('ux'),
+  };
+
+  const existing = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+  existing.push(data);
+  localStorage.setItem('surveyResponses', JSON.stringify(existing));
+
+  document.getElementById('surveyForm').style.display = 'none';
+  document.getElementById('successScreen').style.display = 'block';
+  document.querySelector('.progress-bar').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>

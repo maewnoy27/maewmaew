@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบสอบถาม</title>
+  <style>
+    :root[data-theme="light"] {
+      --bg: #fdf2f8;
+      --card: #fff5f9;
+      --text: #4a1942;
+      --subtext: #9b5a7e;
+      --label: #6b2d5e;
+      --border: #f0c2df;
+      --border-focus: #e879a8;
+      --shadow-focus: rgba(232,121,168,0.2);
+      --input-bg: #fff5f9;
+      --input-text: #4a1942;
+      --btn-bg: #e879a8;
+      --btn-hover: #be185d;
+      --success-bg: #fdf2f8;
+      --success-border: #f9a8d4;
+      --success-text: #9d174d;
+      --toggle-bg: #fce7f3;
+      --admin-link: #e879a8;
+      --chip-active-bg: #fce7f3;
+      --chip-active-border: #e879a8;
+      --chip-active-text: #be185d;
+      --section-border: #f0c2df;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --subtext: #94a3b8;
+      --label: #e2e8f0;
+      --border: #334155;
+      --border-focus: #60a5fa;
+      --shadow-focus: rgba(96,165,250,0.25);
+      --input-bg: #0f172a;
+      --input-text: #f1f5f9;
+      --btn-bg: #3b82f6;
+      --btn-hover: #2563eb;
+      --success-bg: #052e16;
+      --success-border: #166534;
+      --success-text: #86efac;
+      --toggle-bg: #334155;
+      --admin-link: #60a5fa;
+      --chip-active-bg: #1e3a5f;
+      --chip-active-border: #60a5fa;
+      --chip-active-text: #93c5fd;
+      --section-border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 32px 20px;
+      transition: background 0.3s;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      padding: 40px;
+      width: 100%;
+      max-width: 560px;
+      transition: background 0.3s;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    h1 { font-size: 1.6rem; color: var(--text); }
+
+    .theme-toggle {
+      background: var(--toggle-bg);
+      border: none;
+      border-radius: 50px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.3s;
+    }
+    .theme-toggle:hover { opacity: 0.8; }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--subtext);
+      margin-bottom: 4px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--label);
+      margin: 24px 0 14px;
+      padding-bottom: 9px;
+      border-bottom: 1.5px solid var(--section-border);
+    }
+    .section-num {
+      background: var(--btn-bg);
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--label);
+      margin-bottom: 6px;
+    }
+    label .req { color: #ef4444; margin-left: 2px; }
+    label .opt { font-weight: 400; color: var(--subtext); }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--input-text);
+      background: var(--input-bg);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
+      outline: none;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--shadow-focus);
+    }
+    input.error { border-color: #ef4444 !important; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--subtext);
+      pointer-events: none;
+    }
+    select {
+      width: 100%;
+      padding: 10px 36px 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--input-text);
+      background: var(--input-bg);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.3s;
+    }
+    select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--shadow-focus);
+    }
+    select.error { border-color: #ef4444 !important; }
+
+    /* Chip groups (radio & checkbox) */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+
+    .chip-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 15px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--text);
+      font-weight: 500;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      user-select: none;
+      position: relative;
+    }
+    /* visually hidden but functionally present */
+    .chip-label input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+    .chip-label.active {
+      border-color: var(--chip-active-border);
+      background: var(--chip-active-bg);
+      color: var(--chip-active-text);
+      font-weight: 600;
+    }
+    .chip-label.error-chip { border-color: #ef4444 !important; }
+
+    /* Star rating */
+    .star-rating { display: flex; gap: 2px; margin-top: 4px; }
+    .star-btn {
+      font-size: 2.2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #d1d5db;
+      transition: color 0.1s, transform 0.1s;
+      padding: 0 3px;
+      line-height: 1;
+    }
+    .star-btn.lit { color: #fbbf24; }
+    .star-btn:hover { transform: scale(1.15); }
+
+    .rating-hint {
+      font-size: 0.8rem;
+      color: var(--subtext);
+      margin-top: 5px;
+      min-height: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--input-text);
+      background: var(--input-bg);
+      outline: none;
+      resize: vertical;
+      min-height: 90px;
+      font-family: inherit;
+      transition: border-color 0.2s, background 0.3s;
+    }
+    textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--shadow-focus);
+    }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: #ef4444;
+      margin-top: 5px;
+      display: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: var(--btn-bg);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    button[type="submit"]:hover { background: var(--btn-hover); }
+
+    .success {
+      display: none;
+      text-align: center;
+      color: var(--success-text);
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 18px;
+      font-weight: 600;
+    }
+
+    .admin-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--admin-link);
+      text-decoration: none;
+    }
+    .admin-link:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+      .card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top-bar">
+      <h1>แบบสอบถาม</h1>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span> <span id="themeLabel">โทนมืด</span>
+      </button>
+    </div>
+    <p class="subtitle">กรุณากรอกข้อมูลของท่านให้ครบถ้วน</p>
+
+    <form id="surveyForm" novalidate>
+
+      <!-- ===== ส่วนที่ 1: ข้อมูลส่วนตัว ===== -->
+      <div class="section-header">
+        <span class="section-num">1</span> ข้อมูลส่วนตัว
+      </div>
+
+      <div class="field">
+        <label for="name">ชื่อ-นามสกุล <span class="req">*</span></label>
+        <input type="text" id="name" placeholder="เช่น สมชาย ใจดี">
+        <div class="error-msg" id="nameError">กรุณากรอกชื่อ-นามสกุล</div>
+      </div>
+
+      <div class="field">
+        <label for="email">อีเมล์ <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="example@email.com">
+        <div class="error-msg" id="emailError">กรุณากรอกอีเมล์ให้ถูกต้อง</div>
+      </div>
+
+      <div class="field">
+        <label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input type="tel" id="phone" placeholder="0XX-XXX-XXXX" maxlength="12">
+        <div class="error-msg" id="phoneError">กรุณากรอกเบอร์โทรให้ถูกต้อง (10 หลัก)</div>
+      </div>
+
+      <div class="field">
+        <label for="age">ช่วงอายุ <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="age">
+            <option value="">-- เลือกช่วงอายุ --</option>
+            <option value="ต่ำกว่า 18 ปี">ต่ำกว่า 18 ปี</option>
+            <option value="18–25 ปี">18 – 25 ปี</option>
+            <option value="26–35 ปี">26 – 35 ปี</option>
+            <option value="36–45 ปี">36 – 45 ปี</option>
+            <option value="46 ปีขึ้นไป">46 ปีขึ้นไป</option>
+          </select>
+        </div>
+        <div class="error-msg" id="ageError">กรุณาเลือกช่วงอายุ</div>
+      </div>
+
+      <div class="field">
+        <label>เพศ <span class="req">*</span></label>
+        <div class="chip-group" id="genderGroup">
+          <label class="chip-label">
+            <input type="radio" name="gender" value="ชาย"> ชาย
+          </label>
+          <label class="chip-label">
+            <input type="radio" name="gender" value="หญิง"> หญิง
+          </label>
+          <label class="chip-label">
+            <input type="radio" name="gender" value="ไม่ระบุ"> ไม่ระบุ
+          </label>
+        </div>
+        <div class="error-msg" id="genderError">กรุณาเลือกเพศ</div>
+      </div>
+
+      <div class="field">
+        <label for="occupation">อาชีพ <span class="opt">(ไม่บังคับ)</span></label>
+        <div class="select-wrap">
+          <select id="occupation">
+            <option value="">-- เลือกอาชีพ --</option>
+            <option value="นักเรียน/นักศึกษา">นักเรียน / นักศึกษา</option>
+            <option value="พนักงานบริษัท">พนักงานบริษัท</option>
+            <option value="ข้าราชการ/รัฐวิสาหกิจ">ข้าราชการ / รัฐวิสาหกิจ</option>
+            <option value="ธุรกิจส่วนตัว">ธุรกิจส่วนตัว</option>
+            <option value="ฟรีแลนซ์">ฟรีแลนซ์</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ===== ส่วนที่ 2: ความคิดเห็น ===== -->
+      <div class="section-header">
+        <span class="section-num">2</span> ความคิดเห็น
+      </div>
+
+      <div class="field">
+        <label>ระดับความพึงพอใจโดยรวม <span class="req">*</span></label>
+        <input type="hidden" id="rating" value="0">
+        <div class="star-rating" id="starRating">
+          <button type="button" class="star-btn" data-val="1">★</button>
+          <button type="button" class="star-btn" data-val="2">★</button>
+          <button type="button" class="star-btn" data-val="3">★</button>
+          <button type="button" class="star-btn" data-val="4">★</button>
+          <button type="button" class="star-btn" data-val="5">★</button>
+        </div>
+        <div class="rating-hint" id="ratingHint"></div>
+        <div class="error-msg" id="ratingError">กรุณาให้คะแนนความพึงพอใจ</div>
+      </div>
+
+      <div class="field">
+        <label>รู้จักเราจากช่องทางใด <span class="opt">(เลือกได้หลายข้อ)</span></label>
+        <div class="chip-group" id="sourceGroup">
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="Facebook"> Facebook
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="Instagram"> Instagram
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="TikTok"> TikTok
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="Google"> Google
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="เพื่อนแนะนำ"> เพื่อนแนะนำ
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="source" value="อื่นๆ"> อื่นๆ
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="comments">ข้อเสนอแนะ / ความคิดเห็น <span class="opt">(ไม่บังคับ)</span></label>
+        <textarea id="comments" placeholder="กรุณาแสดงความคิดเห็นของท่าน..."></textarea>
+      </div>
+
+      <button type="submit">ส่งข้อมูล</button>
+      <div class="success" id="successMsg">✅ ส่งข้อมูลเรียบร้อยแล้ว ขอบคุณที่กรอกแบบสอบถาม!</div>
+    </form>
+
+    <a href="admin.html" class="admin-link">🔧 ไปหน้าดูข้อมูล (Admin)</a>
+  </div>
+
+  <script>
+    const saved = localStorage.getItem('theme') || 'light';
+    setTheme(saved);
+
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      document.getElementById('themeIcon').textContent = t === 'dark' ? '☀️' : '🌙';
+      document.getElementById('themeLabel').textContent = t === 'dark' ? 'โทนสว่าง' : 'โทนมืด';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+
+    // Phone auto-format
+    document.getElementById('phone').addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 10);
+      if (v.length > 6) v = v.slice(0,3) + '-' + v.slice(3,6) + '-' + v.slice(6);
+      else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+      this.value = v;
+    });
+
+    // Radio chips (gender)
+    document.querySelectorAll('#genderGroup .chip-label').forEach(chip => {
+      chip.addEventListener('click', function () {
+        document.querySelectorAll('#genderGroup .chip-label').forEach(c =>
+          c.classList.remove('active', 'error-chip'));
+        this.classList.add('active');
+        this.querySelector('input').checked = true;
+      });
+    });
+
+    // Checkbox chips (source)
+    document.querySelectorAll('#sourceGroup .chip-label').forEach(chip => {
+      chip.addEventListener('click', function () {
+        const inp = this.querySelector('input');
+        inp.checked = !inp.checked;
+        this.classList.toggle('active', inp.checked);
+      });
+    });
+
+    // Star rating
+    const ratingLabels = ['', 'แย่มาก', 'พอใช้', 'ปานกลาง', 'ดี', 'ดีมาก'];
+    const stars = document.querySelectorAll('.star-btn');
+
+    function setStars(val) {
+      stars.forEach((s, i) => s.classList.toggle('lit', i < val));
+      document.getElementById('ratingHint').textContent =
+        val ? `${val} / 5 — ${ratingLabels[val]}` : '';
+      document.getElementById('rating').value = val;
+    }
+
+    stars.forEach(star => {
+      star.addEventListener('click', () => setStars(parseInt(star.dataset.val)));
+      star.addEventListener('mouseenter', () => {
+        const v = parseInt(star.dataset.val);
+        stars.forEach((s, i) => s.classList.toggle('lit', i < v));
+        document.getElementById('ratingHint').textContent = `${v} / 5 — ${ratingLabels[v]}`;
+      });
+    });
+    document.getElementById('starRating').addEventListener('mouseleave', () => {
+      setStars(parseInt(document.getElementById('rating').value));
+    });
+
+    function showError(inputId, errId, show) {
+      const el = document.getElementById(inputId);
+      if (el) el.classList.toggle('error', show);
+      document.getElementById(errId).style.display = show ? 'block' : 'none';
+    }
+
+    document.getElementById('surveyForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const rawPhone = document.getElementById('phone').value.replace(/\D/g, '');
+      const age      = document.getElementById('age').value;
+      const gender   = document.querySelector('input[name="gender"]:checked')?.value || '';
+      const rating   = parseInt(document.getElementById('rating').value);
+      const emailOk  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      showError('name',  'nameError',  !name);
+      showError('email', 'emailError', !emailOk);
+      showError('phone', 'phoneError', rawPhone.length !== 10);
+      showError('age',   'ageError',   !age);
+
+      const genderOk = !!gender;
+      document.getElementById('genderError').style.display = genderOk ? 'none' : 'block';
+      if (!genderOk) {
+        document.querySelectorAll('#genderGroup .chip-label').forEach(c => c.classList.add('error-chip'));
+      }
+
+      const ratingOk = rating > 0;
+      document.getElementById('ratingError').style.display = ratingOk ? 'none' : 'block';
+
+      if (!name || !emailOk || rawPhone.length !== 10 || !age || !genderOk || !ratingOk) return;
+
+      const sources    = [...document.querySelectorAll('input[name="source"]:checked')].map(c => c.value);
+      const comments   = document.getElementById('comments').value.trim();
+      const occupation = document.getElementById('occupation').value;
+
+      const list = JSON.parse(localStorage.getItem('submissions') || '[]');
+      list.push({
+        id: Date.now(),
+        name, email,
+        phone: document.getElementById('phone').value,
+        age, gender, occupation, rating, sources, comments,
+        date: new Date().toLocaleString('th-TH')
+      });
+      localStorage.setItem('submissions', JSON.stringify(list));
+
+      document.getElementById('successMsg').style.display = 'block';
+      this.reset();
+      setStars(0);
+      document.querySelectorAll('.chip-label').forEach(c => c.classList.remove('active', 'error-chip'));
+    });
+  </script>
+</body>
+</html>
