@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — ร้านแฟชั่นเสื้อผ้า</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',sans-serif;background:#f5f3ff;color:#1e1b4b;min-height:100vh;}
+
+    /* ── HEADER ── */
+    .header{
+      background:linear-gradient(135deg,#7c3aed,#ec4899);
+      padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;
+      box-shadow:0 4px 20px rgba(124,58,237,.3);
+    }
+    .header-brand{display:flex;align-items:center;gap:12px;color:#fff;}
+    .header-brand i{font-size:1.5rem;}
+    .header-brand h1{font-size:1.25rem;font-weight:800;letter-spacing:.5px;}
+    .header-right{display:flex;align-items:center;gap:16px;color:rgba(255,255,255,.85);font-size:.85rem;}
+    .header-right i{font-size:1rem;}
+
+    /* ── HERO ── */
+    .hero{
+      text-align:center;padding:48px 24px 32px;
+    }
+    .hero h2{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7c3aed,#ec4899);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+    .hero p{color:#64748b;font-size:1rem;}
+
+    /* ── SECTIONS ── */
+    .section-title{
+      display:flex;align-items:center;gap:10px;margin:0 auto 20px;max-width:960px;padding:0 24px;
+    }
+    .section-title i{font-size:1.1rem;color:#7c3aed;}
+    .section-title h3{font-size:1.1rem;font-weight:700;color:#1e1b4b;}
+    .section-title .line{flex:1;height:2px;background:linear-gradient(90deg,#e9d5ff,transparent);border-radius:2px;}
+
+    /* ── GRID ── */
+    .grid{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;
+      max-width:960px;margin:0 auto 40px;padding:0 24px;
+    }
+
+    /* ── CARD ── */
+    .dash-card{
+      background:#fff;border-radius:20px;padding:28px 24px;text-decoration:none;
+      box-shadow:0 2px 16px rgba(124,58,237,.06);border:1.5px solid rgba(124,58,237,.08);
+      transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:14px;
+    }
+    .dash-card:hover{
+      transform:translateY(-6px);box-shadow:0 12px 36px rgba(124,58,237,.15);
+      border-color:rgba(124,58,237,.2);
+    }
+    .dash-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:20px 20px 0 0;
+    }
+
+    /* card colors */
+    .dash-card.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+    .dash-card.pink::before{background:linear-gradient(90deg,#ec4899,#f472b6);}
+    .dash-card.green::before{background:linear-gradient(90deg,#10b981,#34d399);}
+    .dash-card.amber::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+    .dash-card.blue::before{background:linear-gradient(90deg,#3b82f6,#60a5fa);}
+    .dash-card.red::before{background:linear-gradient(90deg,#ef4444,#f87171);}
+
+    .card-icon{
+      width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+      font-size:1.5rem;
+    }
+    .dash-card.purple .card-icon{background:#ede9fe;color:#7c3aed;}
+    .dash-card.pink .card-icon{background:#fce7f3;color:#ec4899;}
+    .dash-card.green .card-icon{background:#d1fae5;color:#10b981;}
+    .dash-card.amber .card-icon{background:#fef3c7;color:#f59e0b;}
+    .dash-card.blue .card-icon{background:#dbeafe;color:#3b82f6;}
+    .dash-card.red .card-icon{background:#fee2e2;color:#ef4444;}
+
+    .card-text h4{font-size:1.05rem;font-weight:700;color:#1e1b4b;margin-bottom:4px;}
+    .card-text p{font-size:.82rem;color:#64748b;line-height:1.4;}
+
+    .card-arrow{
+      position:absolute;bottom:20px;right:20px;width:32px;height:32px;border-radius:50%;
+      background:#f5f3ff;display:flex;align-items:center;justify-content:center;
+      color:#7c3aed;font-size:.8rem;transition:all .2s;
+    }
+    .dash-card:hover .card-arrow{background:#7c3aed;color:#fff;transform:translateX(3px);}
+
+    /* ── BADGE ── */
+    .badge{
+      display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;
+      font-size:.7rem;font-weight:600;
+    }
+    .badge.front{background:#dbeafe;color:#2563eb;}
+    .badge.back{background:#fce7f3;color:#db2777;}
+
+    /* ── FOOTER ── */
+    .footer{
+      text-align:center;padding:24px;color:#94a3b8;font-size:.8rem;border-top:1px solid #ede9fe;
+      margin-top:20px;
+    }
+    .footer a{color:#7c3aed;text-decoration:none;font-weight:600;}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:640px){
+      .hero h2{font-size:1.5rem;}
+      .grid{grid-template-columns:1fr;}
+      .header{padding:0 16px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-brand">
+    <i class="fas fa-store"></i>
+    <h1>Fashion Store</h1>
+  </div>
+  <div class="header-right">
+    <i class="fas fa-calendar-day"></i>
+    <span id="dateNow"></span>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <h2>🏠 แดชบอร์ดร้านแฟชั่นเสื้อผ้า</h2>
+  <p>เลือกเมนูที่ต้องการเข้าใช้งานระบบหน้าบ้านหรือหลังบ้าน</p>
+</div>
+
+<!-- ═══ FRONTEND ═══ -->
+<div class="section-title">
+  <i class="fas fa-desktop"></i>
+  <h3>ระบบหน้าบ้าน (Frontend)</h3>
+  <div class="line"></div>
+</div>
+<div class="grid">
+
+  <a href="fashion-pos.html" class="dash-card purple">
+    <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+    <div class="card-text">
+      <h4>🛒 ระบบ POS ขายสินค้า</h4>
+      <p>เลือกสินค้า เพิ่มตะกร้า คิดเงิน ส่วนลด และพิมพ์ใบเสร็จ</p>
+    </div>
+    <span class="badge front"><i class="fas fa-eye"></i> หน้าบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+  <a href="payment.html" class="dash-card pink">
+    <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+    <div class="card-text">
+      <h4>💳 ระบบชำระเงิน</h4>
+      <p>รับชำระด้วยเงินสด, QR Code, บัตรเครดิต, โอนเงิน</p>
+    </div>
+    <span class="badge front"><i class="fas fa-eye"></i> หน้าบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+  <a href="review.html" class="dash-card green">
+    <div class="card-icon"><i class="fas fa-star-half-stroke"></i></div>
+    <div class="card-text">
+      <h4>⭐ หน้ารีวิวลูกค้า</h4>
+      <p>ให้คะแนนดาว เขียนรีวิว อัปโหลดรูป แชร์ประสบการณ์</p>
+    </div>
+    <span class="badge front"><i class="fas fa-eye"></i> หน้าบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+  <a href="survey-form.html" class="dash-card amber">
+    <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+    <div class="card-text">
+      <h4>📋 แบบสอบถามลูกค้า</h4>
+      <p>สำรวจความพึงพอใจ พฤติกรรมการซื้อ และข้อเสนอแนะ</p>
+    </div>
+    <span class="badge front"><i class="fas fa-eye"></i> หน้าบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+</div>
+
+<!-- ═══ BACKEND ═══ -->
+<div class="section-title">
+  <i class="fas fa-cogs"></i>
+  <h3>ระบบหลังบ้าน (Admin / Backend)</h3>
+  <div class="line"></div>
+</div>
+<div class="grid">
+
+  <a href="review-admin.html" class="dash-card blue">
+    <div class="card-icon"><i class="fas fa-comments"></i></div>
+    <div class="card-text">
+      <h4>📊 จัดการรีวิว (Admin)</h4>
+      <p>อนุมัติ ตอบกลับ ลบรีวิว ดูสถิติ และ Export CSV</p>
+    </div>
+    <span class="badge back"><i class="fas fa-lock"></i> หลังบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+  <a href="survey-admin.html" class="dash-card red">
+    <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+    <div class="card-text">
+      <h4>📈 จัดการแบบสอบถาม (Admin)</h4>
+      <p>ดูผลสำรวจ NPS กราฟสถิติ ตาราง และ Export CSV</p>
+    </div>
+    <span class="badge back"><i class="fas fa-lock"></i> หลังบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+  <a href="admin.html" class="dash-card purple">
+    <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+    <div class="card-text">
+      <h4>🛡️ แอดมินระบบ</h4>
+      <p>จัดการข้อมูลร้าน ดูรายงาน และตั้งค่าระบบ</p>
+    </div>
+    <span class="badge back"><i class="fas fa-lock"></i> หลังบ้าน</span>
+    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+  </a>
+
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <p>👗 Fashion Store POS System &copy; 2025 — Powered by <a href="#">Fashion Team</a></p>
+</div>
+
+<script>
+// ── Date display ──
+const d = new Date();
+document.getElementById('dateNow').textContent =
+  d.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+</script>
+<script src="theme.js"></script>
+</body>
+</html>
