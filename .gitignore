@@ -1,9 +1,18 @@
 # Claude settings
 .claude/
 
+# Docker — โปรเจคนี้ไม่ใช้ Docker
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+.dockerignore
+
 # OS
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
+
+# Server script (Windows only)
+server.ps1
