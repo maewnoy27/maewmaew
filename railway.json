@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "caddy file-server --root . --listen :$PORT",
+    "startCommand": "python3 -m http.server $PORT",
     "restartPolicyType": "ON_FAILURE"
   }
 }
