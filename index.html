@@ -1,11 +1,1092 @@
-<!DOCTYPE html>
-<html lang="th">
 <head>
-  <meta charset="UTF-8"/>
-  <meta http-equiv="refresh" content="0; url=dashboard.html"/>
-  <title>ร้านแฟชั่นเสื้อผ้า</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบลงทะเบียนเก็บเบอร์โทร</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #667eea;
+      --purple-dark: #5a67d8;
+      --gray-dark: #2d3748;
+      --gray: #4a5568;
+      --gray-light: #718096;
+      --border: #e2e8f0;
+      --bg: #f7fafc;
+      --green: #48bb78;
+      --red: #fc8181;
+      --red-dark: #c53030;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); }
+
+    /* ══════════════════════════════
+       PAGES
+    ══════════════════════════════ */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ══════════════════════════════
+       REGISTER PAGE
+    ══════════════════════════════ */
+    #page-register {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #page-register.active { display: flex; }
+
+    .reg-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+    }
+
+    .reg-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .reg-logo-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .reg-logo h1 { font-size: 22px; color: var(--gray-dark); }
+    .reg-logo p { font-size: 14px; color: var(--gray-light); margin-top: 4px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    label .req { color: var(--red-dark); margin-left: 3px; }
+    label .opt { color: #a0aec0; font-weight: 400; }
+
+    input[type="text"], input[type="tel"], input[type="email"],
+    input[type="password"], input[type="search"], textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--gray-dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: white;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.14);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .alert.success { background: #f0fff4; border: 1.5px solid #68d391; color: #276749; }
+    .alert.error   { background: #fff5f5; border: 1.5px solid var(--red); color: var(--red-dark); }
+
+    .privacy-note {
+      font-size: 12px;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    .link-admin {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .link-admin a {
+      font-size: 13px;
+      color: #a0aec0;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link-admin a:hover { color: var(--purple); }
+
+    /* success state */
+    .success-view { display: none; text-align: center; padding: 20px 0; }
+    .success-view .big-check { font-size: 64px; margin-bottom: 14px; }
+    .success-view h2 { color: #276749; margin-bottom: 8px; }
+    .success-view p { color: var(--gray-light); font-size: 14px; margin-bottom: 20px; }
+    .btn-again {
+      padding: 10px 24px;
+      background: var(--border);
+      color: var(--gray);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-again:hover { background: #cbd5e0; }
+
+    /* ══════════════════════════════
+       LOGIN PAGE
+    ══════════════════════════════ */
+    #page-login {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #page-login.active { display: flex; }
+
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-logo { text-align: center; margin-bottom: 28px; }
+    .login-logo .icon { font-size: 40px; margin-bottom: 10px; }
+    .login-logo h2 { font-size: 20px; color: var(--gray-dark); }
+    .login-logo .sub { font-size: 13px; color: #a0aec0; margin-top: 4px; }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #2d3748, #4a5568);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 4px;
+    }
+
+    .btn-login:hover { opacity: 0.88; }
+
+    .back-link {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .back-link a {
+      font-size: 13px;
+      color: #a0aec0;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .back-link a:hover { color: var(--purple); }
+
+    /* ══════════════════════════════
+       ADMIN DASHBOARD
+    ══════════════════════════════ */
+    #page-admin { display: none; min-height: 100vh; }
+    #page-admin.active { display: block; }
+
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 240px;
+      background: #2d3748;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 22px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-header h2 { font-size: 15px; color: white; }
+    .sidebar-header p  { font-size: 12px; color: #a0aec0; margin-top: 4px; }
+
+    .nav-menu { flex: 1; padding: 8px 0; }
+
+    .nav-item {
+      padding: 13px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #cbd5e0;
+      transition: background 0.15s;
+    }
+
+    .nav-item:hover  { background: rgba(255,255,255,0.07); color: white; }
+    .nav-item.active { background: rgba(102,126,234,0.28); color: white; }
+
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: #cbd5e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover { background: rgba(255,80,80,0.2); color: white; }
+
+    .main-area { margin-left: 240px; min-height: 100vh; }
+
+    .topbar {
+      background: white;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar h1 { font-size: 18px; color: var(--gray-dark); }
+    .topbar .topbar-user { font-size: 13px; color: var(--gray-light); }
+
+    .content-area { padding: 28px; }
+
+    /* sections */
+    .sec { display: none; }
+    .sec.active { display: block; }
+
+    /* stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card .lbl { font-size: 12px; color: var(--gray-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-card .val { font-size: 36px; font-weight: 800; color: var(--gray-dark); }
+    .stat-card .ico { position: absolute; right: 18px; top: 18px; font-size: 28px; opacity: 0.2; }
+
+    /* table card */
+    .table-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .search-box:focus { border-color: var(--purple); }
+
+    .btn-export {
+      padding: 9px 18px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-export:hover { background: #38a169; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      text-align: left;
+      padding: 11px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-light);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 13px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f4f8;
+      color: var(--gray);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbff; }
+
+    .tag-phone {
+      display: inline-block;
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border-radius: 6px;
+      padding: 2px 9px;
+      font-size: 13px;
+      font-family: monospace;
+      letter-spacing: .04em;
+    }
+
+    .btn-del {
+      padding: 5px 12px;
+      background: #fff5f5;
+      border: 1.5px solid var(--red);
+      color: var(--red-dark);
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-del:hover { background: var(--red-dark); color: white; }
+
+    .empty-cell { text-align: center; padding: 48px 20px; color: #a0aec0; }
+    .empty-cell .eico { font-size: 44px; margin-bottom: 10px; }
+
+    .pager {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--gray-light);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pager-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .pg-btn {
+      padding: 5px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--gray);
+      transition: all 0.15s;
+    }
+
+    .pg-btn:hover:not(:disabled) { background: var(--purple); color: white; border-color: var(--purple); }
+    .pg-btn.cur { background: var(--purple); color: white; border-color: var(--purple); }
+    .pg-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .date-tiny { font-size: 12px; color: #a0aec0; white-space: nowrap; }
+
+    /* settings */
+    .settings-card {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      max-width: 460px;
+      margin-bottom: 20px;
+    }
+
+    .settings-card h3 { font-size: 16px; color: var(--gray-dark); margin-bottom: 20px; }
+
+    .btn-save {
+      padding: 10px 24px;
+      background: var(--purple);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .btn-save:hover { background: var(--purple-dark); }
+
+    .inline-msg {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .inline-msg.ok  { background: #f0fff4; border: 1.5px solid #68d391; color: #276749; }
+    .inline-msg.err { background: #fff5f5; border: 1.5px solid var(--red); color: var(--red-dark); }
+
+    .danger-zone { border: 2px solid #feb2b2; border-radius: 12px; padding: 20px; max-width: 460px; }
+    .danger-zone h3 { color: var(--red-dark); margin-bottom: 12px; font-size: 15px; }
+    .danger-zone p  { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+
+    .btn-danger {
+      padding: 10px 20px;
+      background: var(--red-dark);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-danger:hover { background: #9b2c2c; }
+
+    @media (max-width: 680px) {
+      .sidebar { width: 60px; }
+      .sidebar-header, .sidebar-header p, .nav-item span { display: none; }
+      .sidebar-footer .btn-logout { font-size: 0; padding: 10px; }
+      .main-area { margin-left: 60px; }
+    }
+  </style>
 </head>
 <body>
-  <p>กำลังโหลด... <a href="dashboard.html">คลิกที่นี่</a></p>
+
+<!-- ══════════════════════════════
+     PAGE: REGISTER
+══════════════════════════════ -->
+<div id="page-register" class="page active">
+  <div class="reg-card">
+    <div class="reg-logo">
+      <div class="reg-logo-icon">📱</div>
+      <h1>ลงทะเบียนรับข้อมูลข่าวสาร</h1>
+      <p>กรอกข้อมูลเพื่อรับการติดต่อจากเรา</p>
+    </div>
+
+    <!-- form -->
+    <div id="reg-form">
+      <div class="form-group">
+        <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+        <input type="text" id="r-name" placeholder="กรอกชื่อ-นามสกุล" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input type="tel" id="r-phone" placeholder="0XX-XXX-XXXX" maxlength="12">
+      </div>
+      <div class="form-group">
+        <label>อีเมล <span class="opt">(ไม่บังคับ)</span></label>
+        <input type="email" id="r-email" placeholder="example@email.com">
+      </div>
+      <div class="form-group">
+        <label>หมายเหตุ <span class="opt">(ไม่บังคับ)</span></label>
+        <textarea id="r-note" placeholder="ข้อมูลเพิ่มเติม..."></textarea>
+      </div>
+      <button class="btn-submit" id="r-btn" onclick="doRegister()">ลงทะเบียน</button>
+      <div id="r-alert" class="alert"></div>
+      <p class="privacy-note">🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับ</p>
+    </div>
+
+    <!-- success -->
+    <div class="success-view" id="reg-success">
+      <div class="big-check">✅</div>
+      <h2>ลงทะเบียนสำเร็จ!</h2>
+      <p>ขอบคุณที่ลงทะเบียน เราจะติดต่อกลับหาคุณเร็วๆ นี้</p>
+      <button class="btn-again" onclick="resetReg()">ลงทะเบียนอีกครั้ง</button>
+    </div>
+
+    <div class="link-admin">
+      <a onclick="goTo('login')">เข้าสู่ระบบ Admin →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE: LOGIN
+══════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">🔐</div>
+      <h2>Admin Dashboard</h2>
+      <p class="sub">ระบบจัดการข้อมูลผู้ลงทะเบียน</p>
+    </div>
+    <div class="form-group">
+      <label>ชื่อผู้ใช้</label>
+      <input type="text" id="l-user" placeholder="username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="l-pass" placeholder="password" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div id="l-alert" class="alert" style="border-radius:8px;margin-top:12px;"></div>
+    <div class="back-link">
+      <a onclick="goTo('register')">← กลับหน้าลงทะเบียน</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE: ADMIN DASHBOARD
+══════════════════════════════ -->
+<div id="page-admin" class="page">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>📊 Admin Panel</h2>
+      <p id="side-user">ยินดีต้อนรับ</p>
+    </div>
+    <div class="nav-menu">
+      <div class="nav-item active" id="nav-overview"   onclick="showSec('overview',this)">🏠 <span>ภาพรวม</span></div>
+      <div class="nav-item"        id="nav-list"        onclick="showSec('list',this)">📋 <span>รายการลงทะเบียน</span></div>
+      <div class="nav-item"        id="nav-settings"   onclick="showSec('settings',this)">⚙️ <span>ตั้งค่า</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">🚪 <span>ออกจากระบบ</span></button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-area">
+    <div class="topbar">
+      <h1 id="page-title">ภาพรวม</h1>
+      <span class="topbar-user" id="top-user"></span>
+    </div>
+
+    <div class="content-area">
+
+      <!-- SECTION: overview -->
+      <div id="sec-overview" class="sec active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="ico">👥</div>
+            <div class="lbl">ผู้ลงทะเบียนทั้งหมด</div>
+            <div class="val" id="s-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="ico">📅</div>
+            <div class="lbl">ลงทะเบียนวันนี้</div>
+            <div class="val" id="s-today">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="ico">📆</div>
+            <div class="lbl">7 วันล่าสุด</div>
+            <div class="val" id="s-week">0</div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <strong style="font-size:15px;color:#2d3748">5 รายการล่าสุด</strong>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ชื่อ-นามสกุล</th>
+                <th>เบอร์โทร</th>
+                <th>อีเมล</th>
+                <th>วันที่</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION: list -->
+      <div id="sec-list" class="sec">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <input type="search" class="search-box" id="search-box"
+              placeholder="🔍  ค้นหา ชื่อ / เบอร์ / อีเมล..."
+              oninput="debSearch()">
+            <button class="btn-export" onclick="exportCSV()">⬇️ Export CSV</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>เบอร์โทร</th>
+                <th>อีเมล</th>
+                <th>หมายเหตุ</th>
+                <th>วันที่ลงทะเบียน</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="list-tbody"></tbody>
+          </table>
+          <div class="pager">
+            <span id="pager-info"></span>
+            <div class="pager-btns" id="pager-btns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: settings -->
+      <div id="sec-settings" class="sec">
+
+        <div class="settings-card">
+          <h3>🔑 เปลี่ยนรหัสผ่าน Admin</h3>
+          <div class="form-group">
+            <label>รหัสผ่านปัจจุบัน</label>
+            <input type="password" id="pw-old" placeholder="••••••">
+          </div>
+          <div class="form-group">
+            <label>รหัสผ่านใหม่</label>
+            <input type="password" id="pw-new" placeholder="อย่างน้อย 6 ตัวอักษร">
+          </div>
+          <div class="form-group">
+            <label>ยืนยันรหัสผ่านใหม่</label>
+            <input type="password" id="pw-con" placeholder="••••••">
+          </div>
+          <button class="btn-save" onclick="changePw()">บันทึกรหัสผ่าน</button>
+          <div id="pw-msg" class="inline-msg"></div>
+        </div>
+
+        <div class="danger-zone">
+          <h3>⚠️ ลบข้อมูลทั้งหมด</h3>
+          <p>การดำเนินการนี้จะลบรายการลงทะเบียนทั้งหมดออกจากระบบ ไม่สามารถกู้คืนได้</p>
+          <button class="btn-danger" onclick="clearAll()">ลบข้อมูลทั้งหมด</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+//  STORAGE HELPERS
+// ══════════════════════════════
+const STORE_KEY  = 'phone_reg_data';
+const ADMIN_KEY  = 'phone_reg_admin';
+
+function getRegs() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch { return []; }
+}
+
+function saveRegs(arr) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+}
+
+function getAdmin() {
+  const d = localStorage.getItem(ADMIN_KEY);
+  if (d) { try { return JSON.parse(d); } catch {} }
+  return { username: 'admin', password: 'admin1234' };
+}
+
+function saveAdmin(obj) {
+  localStorage.setItem(ADMIN_KEY, JSON.stringify(obj));
+}
+
+// session
+const SESSION_KEY = 'phone_reg_session';
+function getSession() { return sessionStorage.getItem(SESSION_KEY); }
+function setSession(u) { sessionStorage.setItem(SESSION_KEY, u); }
+function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+// ══════════════════════════════
+//  PAGE ROUTING
+// ══════════════════════════════
+function goTo(page) {
+  ['register','login','admin'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) { el.classList.toggle('active', p === page); }
+  });
+}
+
+// ══════════════════════════════
+//  REGISTER
+// ══════════════════════════════
+document.getElementById('r-phone').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 10);
+  if (v.length > 6) v = v.slice(0,3) + '-' + v.slice(3,6) + '-' + v.slice(6);
+  else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+  e.target.value = v;
+});
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+  el.style.display = 'block';
+}
+
+function doRegister() {
+  const name  = document.getElementById('r-name').value.trim();
+  const phone = document.getElementById('r-phone').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const note  = document.getElementById('r-note').value.trim();
+
+  if (!name)  { showAlert('r-alert', '⚠️ กรุณากรอกชื่อ-นามสกุล', 'error'); return; }
+  if (!phone) { showAlert('r-alert', '⚠️ กรุณากรอกเบอร์โทรศัพท์', 'error'); return; }
+
+  const clean = phone.replace(/\D/g, '');
+  if (clean.length < 9) { showAlert('r-alert', '⚠️ เบอร์โทรศัพท์ไม่ถูกต้อง', 'error'); return; }
+
+  const regs = getRegs();
+  if (regs.find(r => r.phone === clean)) {
+    showAlert('r-alert', '❌ เบอร์โทรนี้ถูกลงทะเบียนแล้ว', 'error'); return;
+  }
+
+  const newEntry = {
+    id: Date.now(),
+    name, phone: clean, email, note,
+    date: new Date().toISOString()
+  };
+
+  regs.unshift(newEntry);
+  saveRegs(regs);
+
+  document.getElementById('reg-form').style.display = 'none';
+  document.getElementById('reg-success').style.display = 'block';
+}
+
+function resetReg() {
+  ['r-name','r-phone','r-email','r-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('r-alert').style.display = 'none';
+  document.getElementById('reg-form').style.display = 'block';
+  document.getElementById('reg-success').style.display = 'none';
+}
+
+// ══════════════════════════════
+//  LOGIN
+// ══════════════════════════════
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const admin = getAdmin();
+
+  if (u === admin.username && p === admin.password) {
+    setSession(u);
+    openDash(u);
+  } else {
+    showAlert('l-alert', '❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+  }
+}
+
+function doLogout() {
+  clearSession();
+  goTo('register');
+}
+
+function openDash(username) {
+  goTo('admin');
+  document.getElementById('side-user').textContent = '👤 ' + username;
+  document.getElementById('top-user').textContent  = '👤 ' + username;
+  showSec('overview', document.getElementById('nav-overview'));
+}
+
+// ══════════════════════════════
+//  ADMIN SECTIONS
+// ══════════════════════════════
+const SEC_TITLES = { overview: 'ภาพรวม', list: 'รายการลงทะเบียน', settings: 'ตั้งค่า' };
+let currentPage = 1;
+const PAGE_SIZE = 15;
+let debTimer = null;
+
+function showSec(name, navEl) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('page-title').textContent = SEC_TITLES[name] || name;
+
+  if (name === 'overview') loadOverview();
+  if (name === 'list')     { currentPage = 1; loadList(); }
+}
+
+// ─── Overview ───────────────
+function loadOverview() {
+  const regs  = getRegs();
+  const today = new Date().toDateString();
+  const week  = new Date(Date.now() - 7 * 86400000);
+
+  document.getElementById('s-total').textContent = regs.length;
+  document.getElementById('s-today').textContent = regs.filter(r => new Date(r.date).toDateString() === today).length;
+  document.getElementById('s-week').textContent  = regs.filter(r => new Date(r.date) >= week).length;
+
+  const tbody = document.getElementById('recent-tbody');
+  const recent = regs.slice(0, 5);
+
+  if (recent.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-cell"><div class="eico">📭</div>ยังไม่มีข้อมูล</div></td></tr>';
+  } else {
+    tbody.innerHTML = recent.map(r => `
+      <tr>
+        <td><strong>${esc(r.name)}</strong></td>
+        <td><span class="tag-phone">${fmtPhone(r.phone)}</span></td>
+        <td>${r.email ? esc(r.email) : '<span style="color:#a0aec0">-</span>'}</td>
+        <td class="date-tiny">${fmtDate(r.date)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// ─── List ───────────────────
+function debSearch() {
+  clearTimeout(debTimer);
+  debTimer = setTimeout(() => { currentPage = 1; loadList(); }, 300);
+}
+
+function loadList() {
+  const q    = document.getElementById('search-box').value.trim().toLowerCase();
+  const all  = getRegs();
+  const filtered = q ? all.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    r.phone.includes(q) ||
+    (r.email || '').toLowerCase().includes(q)
+  ) : all;
+
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > pages) currentPage = pages;
+  const slice = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const offset = (currentPage - 1) * PAGE_SIZE;
+
+  const tbody = document.getElementById('list-tbody');
+
+  if (slice.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-cell"><div class="eico">📭</div>ไม่พบข้อมูล</div></td></tr>';
+  } else {
+    tbody.innerHTML = slice.map((r, i) => `
+      <tr>
+        <td style="color:#a0aec0;font-size:13px">${offset + i + 1}</td>
+        <td><strong>${esc(r.name)}</strong></td>
+        <td><span class="tag-phone">${fmtPhone(r.phone)}</span></td>
+        <td>${r.email ? esc(r.email) : '<span style="color:#a0aec0">-</span>'}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          ${r.note ? esc(r.note) : '<span style="color:#a0aec0">-</span>'}
+        </td>
+        <td class="date-tiny">${fmtDate(r.date)}</td>
+        <td><button class="btn-del" onclick="delRow(${r.id})">ลบ</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // pager info
+  document.getElementById('pager-info').textContent = total === 0
+    ? 'ไม่มีข้อมูล'
+    : `แสดง ${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} จาก ${total} รายการ`;
+
+  // pager buttons
+  const pagerEl = document.getElementById('pager-btns');
+  pagerEl.innerHTML = '';
+
+  const prev = btn('← ก่อนหน้า', currentPage <= 1, () => { currentPage--; loadList(); });
+  pagerEl.appendChild(prev);
+
+  const start = Math.max(1, currentPage - 2);
+  const end   = Math.min(pages, currentPage + 2);
+  for (let p = start; p <= end; p++) {
+    const b = btn(p, false, () => { currentPage = p; loadList(); });
+    if (p === currentPage) b.classList.add('cur');
+    pagerEl.appendChild(b);
+  }
+
+  const next = btn('ถัดไป →', currentPage >= pages, () => { currentPage++; loadList(); });
+  pagerEl.appendChild(next);
+}
+
+function btn(label, disabled, handler) {
+  const b = document.createElement('button');
+  b.className = 'pg-btn';
+  b.textContent = label;
+  b.disabled = disabled;
+  b.onclick = handler;
+  return b;
+}
+
+function delRow(id) {
+  if (!confirm('ยืนยันลบรายการนี้?')) return;
+  saveRegs(getRegs().filter(r => r.id !== id));
+  loadList();
+  loadOverview();
+}
+
+// ─── Export CSV ─────────────
+function exportCSV() {
+  const regs = getRegs();
+  const BOM  = '﻿';
+  const header = 'ลำดับ,ชื่อ-นามสกุล,เบอร์โทร,อีเมล,หมายเหตุ,วันที่ลงทะเบียน\n';
+  const rows = regs.map((r, i) =>
+    `${i + 1},"${r.name}","${fmtPhone(r.phone)}","${r.email || ''}","${r.note || ''}","${fmtDate(r.date)}"`
+  ).join('\n');
+
+  const blob = new Blob([BOM + header + rows], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href: url, download: `registrations_${new Date().toISOString().slice(0,10)}.csv`
+  });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ─── Settings ───────────────
+function changePw() {
+  const oldPw = document.getElementById('pw-old').value;
+  const newPw = document.getElementById('pw-new').value;
+  const conPw = document.getElementById('pw-con').value;
+
+  if (!oldPw || !newPw || !conPw) {
+    showMsg('pw-msg', 'กรุณากรอกข้อมูลให้ครบ', 'err'); return;
+  }
+
+  const admin = getAdmin();
+  if (oldPw !== admin.password) {
+    showMsg('pw-msg', '❌ รหัสผ่านปัจจุบันไม่ถูกต้อง', 'err'); return;
+  }
+  if (newPw.length < 6) {
+    showMsg('pw-msg', '❌ รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร', 'err'); return;
+  }
+  if (newPw !== conPw) {
+    showMsg('pw-msg', '❌ รหัสผ่านใหม่ไม่ตรงกัน', 'err'); return;
+  }
+
+  saveAdmin({ username: admin.username, password: newPw });
+  ['pw-old','pw-new','pw-con'].forEach(id => document.getElementById(id).value = '');
+  showMsg('pw-msg', '✅ เปลี่ยนรหัสผ่านสำเร็จ', 'ok');
+}
+
+function clearAll() {
+  if (!confirm('⚠️ ยืนยันลบรายการลงทะเบียนทั้งหมด?\nการดำเนินการนี้ไม่สามารถกู้คืนได้')) return;
+  saveRegs([]);
+  loadList();
+  loadOverview();
+  alert('ลบข้อมูลทั้งหมดเรียบร้อยแล้ว');
+}
+
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'inline-msg ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ══════════════════════════════
+//  UTILS
+// ══════════════════════════════
+function fmtPhone(p) {
+  if (!p) return '-';
+  p = String(p).replace(/\D/g, '');
+  if (p.length === 10) return p.slice(0,3) + '-' + p.slice(3,6) + '-' + p.slice(6);
+  if (p.length === 9)  return p.slice(0,2) + '-' + p.slice(2,5) + '-' + p.slice(5);
+  return p;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' })
+       + ' ' + d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const activePage = document.querySelector('.page.active');
+  if (activePage?.id === 'page-login') doLogin();
+  else if (activePage?.id === 'page-register' && e.target.tagName !== 'TEXTAREA') doRegister();
+});
+
+// ══════════════════════════════
+//  INIT — auto-resume session
+// ══════════════════════════════
+(function init() {
+  const user = getSession();
+  if (user) {
+    openDash(user);
+  } else {
+    goTo('register');
+  }
+})();
+</script>
 </body>
 </html>
